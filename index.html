@@ -129,7 +129,7 @@ const $=id=>document.getElementById(id);
 const vid=$('vid'), cv=$('cv'), ctx=cv.getContext('2d');
 let videoName="", videoFile=null, labels=[], lastToast=0, mode='ball', pending=null;
 
-const ACTIONS={ serve:['ace','in','error'], attack:['kill','in','error'], block:['stuff','touch','error'], dig:['dig','error'], set:['assist','in'] };
+const ACTIONS={ serve:['ace','in','error'], attack:['kill','in','error'], block:['stuff','touch','error'], dig:['dig','error'], set:['assist','in','error'] };
 const ACTKEY={ s:'serve', a:'attack', b:'block', d:'dig', t:'set' };
 const COLORS={ ball:'#33d17a', ball_absent:'#ff6b6b', ball_hard:'#c792ea', action:'#4dc3ff', score:'#f5c542' };
 const MHINT={ ball:'Click the ball each step — it auto-advances so you can label continuously.',
