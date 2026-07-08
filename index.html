@@ -106,11 +106,16 @@
   <div class="panel" id="panel-action" style="display:none"></div>
   <!-- Score mode panel -->
   <div class="panel" id="panel-score" style="display:none">
-    <div class="scorebox"><span class="l" id="scoreL">0</span> &nbsp;—&nbsp; <span class="r" id="scoreR">0</span></div>
-    <span class="dim">score at current time</span>
+    <span class="dim">Teams are:</span>
+    <div class="seg">
+      <button class="btn ori on" data-o="lr" onclick="setOri('lr')">↔ Left / Right</button>
+      <button class="btn ori" data-o="tb" onclick="setOri('tb')">↕ Top / Bottom</button>
+    </div>
     <span class="sp" style="flex:1"></span>
-    <button class="btn" style="font-size:15px" onclick="addScore('left')">◀ LEFT won rally <kbd>1</kbd></button>
-    <button class="btn" style="font-size:15px" onclick="addScore('right')">RIGHT won rally ▶ <kbd>2</kbd></button>
+    <div class="scorebox"><span class="l" id="sideLname">LEFT</span> <span id="scoreL">0</span> &nbsp;—&nbsp; <span id="scoreR">0</span> <span class="r" id="sideRname">RIGHT</span></div>
+    <span class="sp" style="flex:1"></span>
+    <button class="btn" id="btnS1" style="font-size:15px" onclick="addScore(sides()[0])"></button>
+    <button class="btn" id="btnS2" style="font-size:15px" onclick="addScore(sides()[1])"></button>
   </div>
 
   <div class="hint" id="khint"></div>
@@ -127,23 +132,25 @@
 "use strict";
 const $=id=>document.getElementById(id);
 const vid=$('vid'), cv=$('cv'), ctx=cv.getContext('2d');
-let videoName="", videoFile=null, labels=[], lastToast=0, mode='ball', pending=null;
+let videoName="", videoFile=null, labels=[], lastToast=0, mode='ball', pending=null, courtOri='lr', scoreFlash=null;
 
-const ACTIONS={ serve:['ace','in','error'], attack:['kill','in','error'], block:['stuff','touch','error'], dig:['dig','kill','error'], set:['assist','kill','in','error'] };
+const ACTIONS={ serve:['ace','in','error'], attack:['kill','in','error'], block:['stuff','touch','error'], dig:['dig','kill','error'], set:['assist','kill','in','out','error'] };
 const ACTKEY={ s:'serve', a:'attack', b:'block', d:'dig', t:'set' };
 const COLORS={ ball:'#33d17a', ball_absent:'#ff6b6b', ball_hard:'#c792ea', action:'#4dc3ff', score:'#f5c542' };
 const MHINT={ ball:'Click the ball each step — it auto-advances so you can label continuously.',
              action:'Pause at the moment of contact, click the player, then pick action → outcome. One marker per action; label a spike + block at the same moment as two separate actions.',
-             score:'Play the match and mark each point as the team that won the rally.' };
+             score:'Set how the teams are arranged (↔ left/right or ↕ top/bottom), then mark each point as the side that won the rally.' };
 const KHINT={
   ball:'<kbd>click</kbd> <span class="b">ball</span> · <kbd>n</kbd> <span class="n">no ball</span> · <kbd>h</kbd> <span class="h">hard</span> · <kbd>space</kbd> play/pause · <kbd>&rarr;</kbd>/<kbd>&larr;</kbd> step · <kbd>z</kbd> undo',
   action:'<kbd>click</kbd> the player, then <kbd>s</kbd>erve <kbd>a</kbd>ttack <kbd>b</kbd>lock <kbd>d</kbd>ig se<kbd>t</kbd>, then <kbd>1</kbd>/<kbd>2</kbd>/<kbd>3</kbd> outcome · <kbd>z</kbd> undo/cancel · <kbd>space</kbd> play · <kbd>&rarr;</kbd>/<kbd>&larr;</kbd> step',
-  score:'<kbd>1</kbd> left team won the rally · <kbd>2</kbd> right team won · <kbd>z</kbd> undo · <kbd>space</kbd> play/pause · <kbd>&rarr;</kbd>/<kbd>&larr;</kbd> step' };
+  score:'<kbd>1</kbd> first side won the rally · <kbd>2</kbd> second side won (buttons show which is which) · <kbd>z</kbd> undo · <kbd>space</kbd> play/pause · <kbd>&rarr;</kbd>/<kbd>&larr;</kbd> step' };
 
 // ---------- persistence ----------
 const KEY=n=>"vballlabeler:"+n;
 function save(){ if(videoName) try{ localStorage.setItem(KEY(videoName), JSON.stringify(labels)); }catch(e){} render(); }
-function loadStore(){ if(!videoName) return; try{ const s=localStorage.getItem(KEY(videoName)); labels=s?JSON.parse(s):[]; }catch(e){ labels=[]; } render(); }
+function loadStore(){ if(!videoName) return; try{ const s=localStorage.getItem(KEY(videoName)); labels=s?JSON.parse(s):[]; }catch(e){ labels=[]; }
+  try{ courtOri=localStorage.getItem(KEY(videoName)+':ori')||'lr'; }catch(e){ courtOri='lr'; }
+  render(); if(mode==='score')renderScorePanel(); }
 
 // ---------- video ----------
 $('filePick').onchange=e=>{ const f=e.target.files[0]; if(f) openVideo(f); };
@@ -195,9 +202,19 @@ function renderActionPanel(){ const p=$('panel-action');
     +'<button class="btn" onclick="pending.action=null;renderActionPanel()">back</button>'; }
 
 // score: mark who won each rally
-function scoreAt(t){ let l=0,r=0; for(const x of labels) if(x.type==='score'&&x.t<=t+1e-6){ x.scorer==='left'?l++:r++; } return [l,r]; }
-function addScore(side){ pushLabel({t:now(), type:'score', scorer:side}); toast(side==='left'?'◀ left point':'right point ▶'); renderScorePanel(); }
-function renderScorePanel(){ const [l,r]=scoreAt(vid.currentTime); $('scoreL').textContent=l; $('scoreR').textContent=r; }
+function sides(){ return courtOri==='lr'?['left','right']:['top','bottom']; }
+function sideLabel(s){ return {left:'LEFT ◀',right:'RIGHT ▶',top:'TOP ▲',bottom:'BOTTOM ▼'}[s]||s; }
+function scoreAt(t){ const [a,b]=sides(); let s1=0,s2=0; for(const x of labels) if(x.type==='score'&&x.t<=t+1e-6){ if(x.scorer===a)s1++; else if(x.scorer===b)s2++; } return [s1,s2]; }
+function addScore(side){ pushLabel({t:now(), type:'score', scorer:side}); scoreFlash={side,t0:Date.now()}; toast(sideLabel(side)+' won the rally'); renderScorePanel(); }
+function renderScorePanel(){ const [a,b]=sides(), [l,r]=scoreAt(vid.currentTime);
+  $('scoreL').textContent=l; $('scoreR').textContent=r; $('sideLname').textContent=a.toUpperCase(); $('sideRname').textContent=b.toUpperCase();
+  $('btnS1').innerHTML=sideLabel(a)+' won <kbd>1</kbd>'; $('btnS2').innerHTML=sideLabel(b)+' won <kbd>2</kbd>';
+  document.querySelectorAll('.ori').forEach(x=>x.classList.toggle('on', x.dataset.o===courtOri)); }
+function setOri(o){ if(o===courtOri) return;
+  const map=(o==='tb')?{left:'top',right:'bottom'}:{top:'left',bottom:'right'};   // remap existing so side stays the same team
+  for(const l of labels) if(l.type==='score'&&map[l.scorer]) l.scorer=map[l.scorer];
+  courtOri=o; try{ if(videoName) localStorage.setItem(KEY(videoName)+':ori',o); }catch(e){}
+  save(); renderScorePanel(); }
 
 function undo(){
   if(mode==='action'&&pending){ cancelPending(); return; }
@@ -244,13 +261,18 @@ window.addEventListener('keydown', e=>{
     if(!pending.action){ if(ACTKEY[k]){ e.preventDefault(); pickAction(ACTKEY[k]); } }
     else { const outs=ACTIONS[pending.action]; const i=parseInt(k)-1; if(i>=0&&i<outs.length){ e.preventDefault(); pickOutcome(outs[i]); } }
   }
-  else if(mode==='score'){ if(k==='1'){e.preventDefault();addScore('left');} else if(k==='2'){e.preventDefault();addScore('right');} }
+  else if(mode==='score'){ const [a,b]=sides(); if(k==='1'){e.preventDefault();addScore(a);} else if(k==='2'){e.preventDefault();addScore(b);} }
 });
 
 // ---------- overlay draw ----------
 function nearLabels(t,types){ const tol=Math.max(stepSize()*0.4,0.15); return labels.filter(l=>types.includes(l.type)&&Math.abs(l.t-t)<tol); }
 function prevBall(t){ let best=null; for(const l of labels) if(l.type==='ball'&&l.t<t-1e-6){ if(!best||l.t>best.t)best=l; } return best; }
 function ring(x,y,rad,col,w){ ctx.strokeStyle=col; ctx.lineWidth=w||3; ctx.beginPath(); ctx.arc(x,y,rad,0,7); ctx.stroke(); }
+function sidePos(s){ const W=cv.width,H=cv.height; return {left:{x:W*0.03,y:H*0.5,al:'left'},right:{x:W*0.97,y:H*0.5,al:'right'},
+  top:{x:W*0.5,y:H*0.09,al:'center'},bottom:{x:W*0.5,y:H*0.95,al:'center'}}[s]; }
+function tintHalf(s,a){ const W=cv.width,H=cv.height; ctx.fillStyle=`rgba(245,197,66,${a})`;
+  if(s==='left')ctx.fillRect(0,0,W/2,H); else if(s==='right')ctx.fillRect(W/2,0,W/2,H);
+  else if(s==='top')ctx.fillRect(0,0,W,H/2); else ctx.fillRect(0,H/2,W,H); }
 function draw(){
   requestAnimationFrame(draw);
   if(!vid.src||!cv.width) return;
@@ -265,6 +287,10 @@ function draw(){
       ctx.fillText(`${l.action} · ${l.outcome}`, l.x+18, l.y+5); }
     if(pending){ const pulse=6+4*Math.sin(Date.now()/140); ring(pending.x,pending.y,12+pulse,'#f5c542',3);
       ctx.fillStyle='#f5c542'; ctx.font='bold 15px system-ui'; ctx.fillText(pending.action?('pick outcome'):'pick action', pending.x+18, pending.y+5); }
+  } else if(mode==='score'){
+    if(scoreFlash){ const age=Date.now()-scoreFlash.t0; if(age<650) tintHalf(scoreFlash.side, 0.30*(1-age/650)); else scoreFlash=null; }
+    const [a,b]=sides(); ctx.font='bold 22px system-ui'; ctx.fillStyle='rgba(245,197,66,.6)';
+    for(const s of [a,b]){ const p=sidePos(s); ctx.textAlign=p.al; ctx.fillText(sideLabel(s), p.x, p.y); } ctx.textAlign='left';
   }
   $('timetxt').textContent=t.toFixed(2)+'s / '+((vid.duration||0).toFixed(0))+'s';
 }
@@ -281,15 +307,16 @@ function render(){
 $('track').addEventListener('click', e=>{ const r=e.currentTarget.getBoundingClientRect(); const f=(e.clientX-r.left)/r.width; if(vid.duration) step(f*vid.duration - vid.currentTime); });
 
 // ---------- export / import ----------
-function exportData(){ return { video:videoName, labels: labels.map(l=>{ const o={t:l.t,type:l.type};
+function exportData(){ return { video:videoName, orientation: courtOri==='lr'?'left-right':'top-bottom', labels: labels.map(l=>{ const o={t:l.t,type:l.type};
   if(l.x!=null){o.x=l.x;o.y=l.y;} if(l.action){o.action=l.action;o.outcome=l.outcome;} if(l.scorer){o.scorer=l.scorer;} return o; }) }; }
 function exportJSON(){ if(!videoName){ toast('load a video first'); return; }
   const blob=new Blob([JSON.stringify(exportData(),null,2)],{type:'application/json'});
   const a=$('dl'); a.href=URL.createObjectURL(blob); a.download=videoName+'.json'; a.click(); toast('exported '+videoName+'.json'); }
 $('jsonPick').onchange=e=>{ const f=e.target.files[0]; if(!f) return;
   const rd=new FileReader(); rd.onload=()=>{ try{ const d=JSON.parse(rd.result);
-    labels=(d.labels||[]).filter(l=>l&&typeof l.t==='number'); labels.sort((a,b)=>a.t-b.t); save();
-    if(mode==='score')renderScorePanel(); toast('imported '+labels.length+' labels'); }catch(err){ toast('bad json'); } }; rd.readAsText(f); };
+    labels=(d.labels||[]).filter(l=>l&&typeof l.t==='number'); labels.sort((a,b)=>a.t-b.t);
+    if(d.orientation) courtOri = d.orientation==='top-bottom'?'tb':'lr';
+    save(); if(mode==='score')renderScorePanel(); toast('imported '+labels.length+' labels'); }catch(err){ toast('bad json'); } }; rd.readAsText(f); };
 
 // ---- bundle export: video + labels.json as one .zip (no library, streams the video) ----
 let _crcT=null;
