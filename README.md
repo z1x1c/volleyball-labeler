@@ -109,12 +109,29 @@ A faint green ring shows your last ball so your eye can follow it. The **step** 
 how far it jumps after each click (0.30 s is a good default).
 
 ### Actions mode — who did what
-1. Scrub to the moment of a play.
-2. **Click the player** who made it.
+1. **Pause at the moment of contact** (the spike hit, the serve toss-contact, the block touch).
+2. **Click the player** who made the play.
 3. Pick the **action**: **`s`** serve · **`a`** attack · **`b`** block · **`d`** dig · **`t`** set.
-4. Pick the **outcome** with **`1`** / **`2`** / **`3`** (e.g. attack → kill / in / error).
+4. Pick the **outcome** with **`1`** / **`2`** / **`3`** (some have a 4th) — e.g. attack →
+   kill / in / error, set → assist / kill / in / error.
 
 That's it — click, one key, one key. Press **`z`** to cancel or undo.
+
+**How to do it well (and quickly):**
+- **One marker per action** — it's a single event, *not* a track. You don't re-mark the
+  player as they move; you place one marker at the contact frame and move on.
+- **Approximate is fine.** Time within ~0.1–0.2 s of the hit is plenty (a training clip is
+  taken from a window around the mark), and the position just needs to be **on the right
+  player** (roughly their torso). What matters is the *right player* and the *right
+  action/outcome* — not a frame-perfect or pixel-perfect mark.
+- **No clear contact frame?** (blurred / hidden / skipped by the framerate) — use the
+  nearest frame where you can place the player. The action/outcome usually come from the
+  play context, not that one frame.
+- **Two plays at the same instant** (a spike *and* a block) — label them as **two separate
+  actions**: click the attacker → classify, then click the blocker → classify. Both are
+  saved at that moment.
+- **Not sure it happened, or who did it? Skip it.** A wrong label hurts more than a missing
+  one — only label what you can confidently identify.
 
 ### Score mode — who won each rally
 Play the match, and each time a point is scored, press **`1`** if the **left** team won
