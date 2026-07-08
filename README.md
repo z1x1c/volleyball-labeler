@@ -93,10 +93,11 @@ Needs **Python** (free). Pick your operating system:
 
 Click **Load video** (top-left) and choose a file. Then pick a mode at the top.
 
-Controls shared by every mode: **space** = play/pause, **`→`** / **`←`** = step
-forward/back, **`z`** = undo, and the **speed** buttons (1× / .5× / .25×) slow fast
-rallies down. The colored bar under the video shows everything you've labeled — click
-it to jump anywhere.
+Controls shared by every mode: a **scrubber** sits right below the video (outside the
+frame, so it never covers anything you'd click) — drag it to jump anywhere; it shows
+current / total time. Also **space** = play/pause, **`→`** / **`←`** = step forward/back,
+**`z`** = undo, and the **speed** buttons (1× / .5× / .25×) slow fast rallies down. The
+colored bar further down shows everything you've labeled — click it to jump too.
 
 **Audio waveform.** Below that, a waveform shows the video's sound synced to playback —
 **contacts and whistles appear as spikes**, with a gold line marking the current moment.

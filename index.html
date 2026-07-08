@@ -29,6 +29,9 @@
   .stage canvas{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair}
   .empty{display:flex;align-items:center;justify-content:center;min-height:320px;color:var(--dim);text-align:center;padding:30px;line-height:1.7}
   .empty b{color:var(--ink)}
+  .seekrow{display:flex;align-items:center;gap:10px;margin-top:10px}
+  .seekrow input[type=range]{flex:1;accent-color:var(--accent);height:6px;cursor:pointer}
+  .seektime{color:var(--dim);font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}
   .bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
   .bar label{color:var(--dim);font-size:12px}
   .bar input[type=number]{width:58px;background:#0e1524;border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:5px 6px}
@@ -90,6 +93,11 @@
     </div>
     <video id="vid" playsinline style="display:none"></video>
     <canvas id="cv" style="display:none"></canvas>
+  </div>
+
+  <div class="seekrow">
+    <input type="range" id="seek" min="0" max="100" value="0" step="0.01" title="scrub the video">
+    <span class="seektime" id="seektime">0:00 / 0:00</span>
   </div>
 
   <div class="bar">
@@ -172,7 +180,7 @@ function openVideo(file){
   videoName=file.name.replace(/\.[^.]+$/,''); videoFile=file;
   vid.src=URL.createObjectURL(file); $('vname').textContent=file.name;
   $('empty').style.display='none'; vid.style.display='block'; cv.style.display='block';
-  vid.onloadedmetadata=()=>{ cv.width=vid.videoWidth||1920; cv.height=vid.videoHeight||1080; loadStore(); vid.pause(); };
+  vid.onloadedmetadata=()=>{ cv.width=vid.videoWidth||1920; cv.height=vid.videoHeight||1080; $('seek').max=vid.duration||0; loadStore(); vid.pause(); };
   $('wavewrap').style.display='block'; decodeAudio(file);
 }
 
@@ -272,6 +280,12 @@ cv.addEventListener('click', e=>{
 });
 
 // ---------- transport ----------
+// seekbar (outside the video, so it never blocks labeling on the frame)
+let seekDrag=false;
+$('seek').addEventListener('input', ()=>{ vid.currentTime=parseFloat($('seek').value)||0; if(mode==='score')renderScorePanel(); });
+$('seek').addEventListener('pointerdown', ()=>seekDrag=true);
+window.addEventListener('pointerup', ()=>seekDrag=false);
+function fmt(s){ s=Math.max(0,s||0); const m=Math.floor(s/60); return m+':'+String(Math.floor(s%60)).padStart(2,'0'); }
 function playpause(){ vid.paused?vid.play():vid.pause(); setPlayBtn(); }
 function setPlayBtn(){ $('playbtn').textContent = vid.paused?'▶︎ Play':'❚❚ Pause'; }
 vid.addEventListener('play',setPlayBtn); vid.addEventListener('pause',setPlayBtn);
@@ -326,6 +340,7 @@ function draw(){
     for(const s of [a,b]){ const p=sidePos(s); ctx.textAlign=p.al; ctx.fillText(sideLabel(s), p.x, p.y); } ctx.textAlign='left';
   }
   $('timetxt').textContent=t.toFixed(2)+'s / '+((vid.duration||0).toFixed(0))+'s';
+  if(!seekDrag) $('seek').value=t; $('seektime').textContent=fmt(t)+' / '+fmt(vid.duration);
   drawWave(t);
 }
 requestAnimationFrame(draw);
