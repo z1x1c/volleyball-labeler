@@ -98,6 +98,9 @@ frame, so it never covers anything you'd click) — drag it to jump anywhere; it
 current / total time. Also **space** = play/pause, **`→`** / **`←`** = step forward/back,
 **`z`** = undo, and the **speed** buttons (1× / .5× / .25×) slow fast rallies down. The
 colored bar further down shows everything you've labeled — click it to jump too.
+**⛶ Fullscreen** (or press **`f`**) fills the screen with the video *and* the controls —
+so you get a bigger frame for precise clicking without losing any tools; press **`f`** or
+**Esc** to exit.
 
 **Audio waveform.** Below that, a waveform shows the video's sound synced to playback —
 **contacts and whistles appear as spikes**, with a gold line marking the current moment.

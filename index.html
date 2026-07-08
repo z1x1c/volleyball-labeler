@@ -58,6 +58,8 @@
          padding:9px 16px;border-radius:9px;font-size:13px;opacity:0;transition:opacity .18s;pointer-events:none;z-index:9}
   .toast.show{opacity:1}
   a.dl{display:none}
+  main:fullscreen, main:-webkit-full-screen{ max-width:none; width:100%; height:100%; background:var(--bg); padding:12px 22px; overflow-y:auto; }
+  main:fullscreen .stage video, main:-webkit-full-screen .stage video{ max-height:74vh; }
 </style>
 </head>
 <body>
@@ -112,6 +114,8 @@
     </div>
     <label id="autowrap"><input type="checkbox" id="auto" checked> auto-advance after each label</label>
     <label id="ghostwrap"><input type="checkbox" id="ghost" checked> show last ball</label>
+    <span class="sp" style="flex:1"></span>
+    <button class="btn" id="fsbtn" onclick="toggleFS()" title="fills the screen — video + controls stay usable">⛶ Fullscreen</button>
   </div>
 
   <!-- Actions mode panel -->
@@ -206,7 +210,7 @@ async function decodeAudio(file){
 // ---------- modes ----------
 function setMode(m){ mode=m; pending=null;
   document.querySelectorAll('.mode').forEach(b=>b.classList.toggle('on', b.dataset.m===m));
-  $('mhint').textContent=MHINT[m]; $('khint').innerHTML=KHINT[m];
+  $('mhint').textContent=MHINT[m]; $('khint').innerHTML=KHINT[m]+' · <kbd>f</kbd> full screen';
   $('panel-action').style.display=m==='action'?'flex':'none';
   $('panel-score').style.display=m==='score'?'flex':'none';
   $('autowrap').style.display=m==='ball'?'':'none';
@@ -287,6 +291,13 @@ $('seek').addEventListener('input', ()=>{ vid.currentTime=parseFloat($('seek').v
 $('seek').addEventListener('pointerdown', ()=>seekDrag=true);
 window.addEventListener('pointerup', ()=>seekDrag=false);
 function fmt(s){ s=Math.max(0,s||0); const m=Math.floor(s/60); return m+':'+String(Math.floor(s%60)).padStart(2,'0'); }
+// fullscreen the whole <main> (video + controls stay usable), cross-browser
+function toggleFS(){ const el=document.querySelector('main');
+  const on=document.fullscreenElement||document.webkitFullscreenElement;
+  if(!on){ (el.requestFullscreen||el.webkitRequestFullscreen).call(el); }
+  else { (document.exitFullscreen||document.webkitExitFullscreen).call(document); } }
+function updateFS(){ const on=!!(document.fullscreenElement||document.webkitFullscreenElement); $('fsbtn').textContent=on?'⤢ Exit full screen':'⛶ Fullscreen'; }
+document.addEventListener('fullscreenchange', updateFS); document.addEventListener('webkitfullscreenchange', updateFS);
 function playpause(){ vid.paused?vid.play():vid.pause(); setPlayBtn(); }
 function setPlayBtn(){ $('playbtn').textContent = vid.paused?'▶︎ Play':'❚❚ Pause'; }
 vid.addEventListener('play',setPlayBtn); vid.addEventListener('pause',setPlayBtn);
@@ -298,6 +309,7 @@ window.addEventListener('keydown', e=>{
   if(e.target.tagName==='INPUT') return; if(!vid.src) return;
   const k=e.key.toLowerCase();
   if(k==='z'){ e.preventDefault(); undo(); return; }
+  if(k==='f'){ e.preventDefault(); toggleFS(); return; }
   if(k===' '){ e.preventDefault(); playpause(); return; }
   if(k==='arrowright'){ e.preventDefault(); step(stepSize()); return; }
   if(k==='arrowleft'){ e.preventDefault(); step(-stepSize()); return; }
