@@ -95,12 +95,12 @@
     <canvas id="cv" style="display:none"></canvas>
   </div>
 
-  <div class="seekrow">
+  <div class="seekrow" id="seekrow" style="display:none">
     <input type="range" id="seek" min="0" max="100" value="0" step="0.01" title="scrub the video">
     <span class="seektime" id="seektime">0:00 / 0:00</span>
   </div>
 
-  <div class="bar">
+  <div class="bar" id="transport" style="display:none">
     <button class="btn" id="playbtn" onclick="playpause()">▶︎ Play</button>
     <button class="btn" onclick="step(-stepSize())">◀︎ back</button>
     <button class="btn" onclick="step(stepSize())">step ▶</button>
@@ -132,7 +132,7 @@
 
   <div class="hint" id="khint"></div>
 
-  <div class="cov">
+  <div class="cov" id="cov" style="display:none">
     <div class="track" id="track"></div>
     <div class="meta"><span id="covtxt">—</span><span id="timetxt">0.00s</span></div>
   </div>
@@ -180,6 +180,7 @@ function openVideo(file){
   videoName=file.name.replace(/\.[^.]+$/,''); videoFile=file;
   vid.src=URL.createObjectURL(file); $('vname').textContent=file.name;
   $('empty').style.display='none'; vid.style.display='block'; cv.style.display='block';
+  $('seekrow').style.display='flex'; $('transport').style.display='flex'; $('cov').style.display='block';
   vid.onloadedmetadata=()=>{ cv.width=vid.videoWidth||1920; cv.height=vid.videoHeight||1080; $('seek').max=vid.duration||0; loadStore(); vid.pause(); };
   $('wavewrap').style.display='block'; decodeAudio(file);
 }
