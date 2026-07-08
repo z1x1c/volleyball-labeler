@@ -47,6 +47,10 @@
   .cov .track{height:14px;background:#0e1524;border:1px solid var(--line);border-radius:6px;position:relative;overflow:hidden;cursor:pointer}
   .cov .track i{position:absolute;top:0;bottom:0;width:2px}
   .cov .meta{display:flex;justify-content:space-between;color:var(--dim);font-size:12px;margin-top:5px}
+  .wave{margin-top:12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .wave .wavehead{display:flex;align-items:center;gap:12px;color:var(--dim);font-size:12px;margin-bottom:6px;flex-wrap:wrap}
+  .wave canvas{width:100%;height:72px;display:block;background:#0b1120;border-radius:6px;cursor:crosshair}
+  .wave label{color:var(--dim)} .wave input[type=number]{width:50px;background:#0e1524;border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:4px 6px}
   .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#20304d;border:1px solid var(--line);
          padding:9px 16px;border-radius:9px;font-size:13px;opacity:0;transition:opacity .18s;pointer-events:none;z-index:9}
   .toast.show{opacity:1}
@@ -124,6 +128,15 @@
     <div class="track" id="track"></div>
     <div class="meta"><span id="covtxt">—</span><span id="timetxt">0.00s</span></div>
   </div>
+
+  <div class="wave" id="wavewrap" style="display:none">
+    <div class="wavehead">🔊 <b style="color:var(--ink)">Audio</b> — contacts &amp; whistles show as spikes; click to jump there. <span id="wavestatus"></span>
+      <span class="sp" style="flex:1"></span>
+      <label>window <input type="number" id="wavewin" value="8" min="2" max="60" step="2"> s</label>
+      <label><input type="checkbox" id="wavetoggle" checked> show</label>
+    </div>
+    <canvas id="wave" height="72"></canvas>
+  </div>
 </main>
 
 <div class="toast" id="toast"></div>
@@ -133,6 +146,7 @@
 const $=id=>document.getElementById(id);
 const vid=$('vid'), cv=$('cv'), ctx=cv.getContext('2d');
 let videoName="", videoFile=null, labels=[], lastToast=0, mode='ball', pending=null, courtOri='lr', scoreFlash=null;
+let audioEnv=null, audioRate=0;   // audio peak envelope (bins) + bins/sec, for the waveform
 
 const ACTIONS={ serve:['ace','in','error'], attack:['kill','in','error'], block:['stuff','touch','error'], dig:['dig','kill','error'], set:['assist','kill','in','out','error'] };
 const ACTKEY={ s:'serve', a:'attack', b:'block', d:'dig', t:'set' };
@@ -159,6 +173,25 @@ function openVideo(file){
   vid.src=URL.createObjectURL(file); $('vname').textContent=file.name;
   $('empty').style.display='none'; vid.style.display='block'; cv.style.display='block';
   vid.onloadedmetadata=()=>{ cv.width=vid.videoWidth||1920; cv.height=vid.videoHeight||1080; loadStore(); vid.pause(); };
+  $('wavewrap').style.display='block'; decodeAudio(file);
+}
+
+// Decode the video's audio track into a peak envelope (~500 bins/sec, so contact
+// transients + whistles are visible). Fully local; skips gracefully if it can't.
+async function decodeAudio(file){
+  audioEnv=null; const st=$('wavestatus');
+  if(file.size > 800*1024*1024){ st.textContent='(waveform skipped — very large file)'; return; }
+  st.textContent='decoding audio…';
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext; const ac=new AC();
+    const ab=await ac.decodeAudioData(await file.arrayBuffer());
+    const per=Math.max(1,Math.floor(ab.sampleRate/500));
+    const ch0=ab.getChannelData(0), ch1=ab.numberOfChannels>1?ab.getChannelData(1):null;
+    const n=Math.ceil(ab.length/per), env=new Float32Array(n);
+    for(let i=0;i<n;i++){ let pk=0; const s=i*per, e=Math.min(ab.length,s+per);
+      for(let j=s;j<e;j++){ let v=ch0[j]<0?-ch0[j]:ch0[j]; if(ch1){ const w=ch1[j]<0?-ch1[j]:ch1[j]; if(w>v)v=w; } if(v>pk)pk=v; } env[i]=pk; }
+    audioEnv=env; audioRate=ab.sampleRate/per; if(ac.close)ac.close(); st.textContent='';
+  }catch(err){ audioEnv=null; st.textContent='(no audio track / couldn’t decode)'; }
 }
 
 // ---------- modes ----------
@@ -293,8 +326,30 @@ function draw(){
     for(const s of [a,b]){ const p=sidePos(s); ctx.textAlign=p.al; ctx.fillText(sideLabel(s), p.x, p.y); } ctx.textAlign='left';
   }
   $('timetxt').textContent=t.toFixed(2)+'s / '+((vid.duration||0).toFixed(0))+'s';
+  drawWave(t);
 }
 requestAnimationFrame(draw);
+
+// synced audio waveform: a window around the playhead, transients as spikes, label
+// ticks + a center playhead. Click to jump. General aid for ALL modes.
+function drawWave(t){
+  const wc=$('wave'); if(!wc||wc.offsetParent===null) return;
+  const cw=wc.clientWidth|0; if(cw && wc.width!==cw) wc.width=cw;
+  const wx=wc.getContext('2d'), W=wc.width, H=wc.height; wx.clearRect(0,0,W,H);
+  if(!$('wavetoggle').checked || !audioEnv || !vid.duration) return;
+  const win=Math.max(2,parseFloat($('wavewin').value)||8), t0=t-win/2, mid=H/2;
+  wx.strokeStyle='rgba(77,195,255,.85)'; wx.lineWidth=1; wx.beginPath();
+  for(let px=0;px<W;px++){ const bin=Math.floor((t0+(px/W)*win)*audioRate);
+    const v=(bin>=0&&bin<audioEnv.length)?audioEnv[bin]:0, h=Math.min(mid-1, v*mid*1.5);
+    wx.moveTo(px+0.5,mid-h); wx.lineTo(px+0.5,mid+h); }
+  wx.stroke();
+  for(const l of labels){ if(l.t<t0||l.t>t0+win) continue; const px=(l.t-t0)/win*W;
+    wx.fillStyle=COLORS[l.type]||'#888'; wx.fillRect(px-1,0,2,H); }
+  wx.strokeStyle='#f5c542'; wx.lineWidth=2; wx.beginPath(); wx.moveTo(W/2,0); wx.lineTo(W/2,H); wx.stroke();
+}
+$('wave').addEventListener('click', e=>{ if(!audioEnv||!vid.duration) return;
+  const r=$('wave').getBoundingClientRect(), win=Math.max(2,parseFloat($('wavewin').value)||8);
+  const tt=(vid.currentTime-win/2)+((e.clientX-r.left)/r.width)*win; step(clamp(tt,0,vid.duration)-vid.currentTime); });
 
 // ---------- coverage + count ----------
 function render(){

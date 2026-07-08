@@ -98,6 +98,13 @@ forward/back, **`z`** = undo, and the **speed** buttons (1× / .5× / .25×) slo
 rallies down. The colored bar under the video shows everything you've labeled — click
 it to jump anywhere.
 
+**Audio waveform.** Below that, a waveform shows the video's sound synced to playback —
+**contacts and whistles appear as spikes**, with a gold line marking the current moment.
+Click it to jump to a sound. It's especially useful when something happens **off-frame
+or in a blur** — e.g. a serve you can *hear* but can't *see* — so you can find the moment
+by its sound and label it. (Adjust the **window** seconds to zoom in/out; untick **show**
+to hide it. Your labels appear as colored ticks on it too.)
+
 ### ● Ball mode — where is the ball
 | Do this | To mark |
 |---|---|
