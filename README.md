@@ -1,38 +1,41 @@
-# 🏐 Ball Labeler
+# 🏐 Volleyball Labeler
 
-**Mark where the ball is in a volleyball video, one click at a time.**
+**Label a volleyball video in your browser** — where the ball is, who did what, and
+who won each rally.
 
-It runs entirely inside your web browser. Nothing gets installed on your computer,
-and your videos are **never uploaded anywhere** — they stay on your machine. The
-result is a small file listing the ball's position over time, used to train a
-ball-tracking model.
+It runs entirely inside your web browser. Nothing gets installed, and your videos are
+**never uploaded anywhere** — they stay on your machine. The result is a small file of
+labels used to train and check a volleyball-analysis model.
 
 No coding needed. If you can use a web browser, you can use this.
 
+There are three labeling modes, and you switch between them with the buttons at the top:
+
+- **● Ball** — mark where the ball is, moment to moment.
+- **Actions** — mark who did what (serve / attack / block / dig / set) and how it ended.
+- **Score** — mark who won each rally.
+
 ---
 
-## What you'll do (the whole thing in 4 steps)
+## What you'll do (4 steps)
 
 1. **Get the app** onto your computer.
 2. **Open it** in your web browser.
-3. **Load a video** and click the ball as it moves.
-4. **Save** your labels to a file.
-
-That's it. Below is the same thing, spelled out.
+3. **Load a video** and label it.
+4. **Save / send** your work.
 
 ---
 
 ## Step 1 — Get the app onto your computer
 
 ### Easiest way (no tools needed)
-1. On this project's GitHub page, click the green **`< > Code`** button.
-2. Click **Download ZIP**.
-3. Find the downloaded `.zip` file and unzip it:
+1. On this project's GitHub page, click the green **`< > Code`** button → **Download ZIP**.
+2. Unzip it:
    - **Windows:** right-click the file → **Extract All…** → **Extract**.
    - **macOS:** double-click the file.
-   - **Linux:** right-click → **Extract Here** (or `unzip ball-labeler.zip`).
+   - **Linux:** right-click → **Extract Here** (or `unzip *.zip`).
 
-You now have a folder called `ball-labeler` with a file named **`index.html`** inside.
+You'll get a folder with a file named **`index.html`** inside.
 
 ### If you know git
 ```
@@ -43,102 +46,100 @@ git clone <repository-url>
 
 ## Step 2 — Open the app in your browser
 
-Inside the folder, **double-click `index.html`**. It should open in your default web
-browser (Chrome, Edge, Firefox, or Safari). In most cases, you're done — skip to Step 3.
+Inside the folder, **double-click `index.html`**. It opens in your default browser
+(Chrome, Edge, Firefox, or Safari). In most cases you're done — skip to Step 3.
 
-> **If your video later refuses to load** (some browsers block videos opened this way
-> for security), use the "local server" method below. It's one command and takes 30
-> seconds. You only need this if double-clicking didn't let the video play.
+> **If your video later refuses to load** (some browsers block local videos for
+> security), use the "local server" method below — one command, ~30 seconds. You only
+> need it if double-clicking didn't let the video play.
 
 <details>
 <summary><b>▶ Local server method (only if the video won't load)</b></summary>
 
-This needs **Python** (free). Pick your operating system:
+Needs **Python** (free). Pick your operating system:
 
 ### 🪟 Windows
-
-1. Open the `ball-labeler` folder in **File Explorer**.
-2. Click the **address bar** at the top (where the folder path is shown), type **`cmd`**,
-   and press **Enter**. A black **Command Prompt** window opens, already in the folder.
+1. Open the folder in **File Explorer**.
+2. Click the **address bar** (where the folder path shows), type **`cmd`**, press **Enter**.
+   A black **Command Prompt** opens, already in the folder.
 3. Type this and press Enter:
    ```
    python -m http.server 8000
    ```
-   - If it says *"python is not recognized"*, try **`py -m http.server 8000`** instead.
+   - If it says *"python is not recognized"*, try **`py -m http.server 8000`**.
    - If you have neither, install Python from <https://www.python.org/downloads/>
-     (during setup, tick **"Add Python to PATH"**), then repeat.
-4. Open your browser and go to: **http://localhost:8000**
-5. When you're done labeling, close the Command Prompt window (or press **Ctrl + C**).
+     (tick **"Add Python to PATH"** during setup) and try again.
+4. Open your browser to **http://localhost:8000**
+5. When done, close the window (or press **Ctrl + C**).
 
 ### 🍎 macOS
-
-1. Open the **Terminal** app (press **Cmd + Space**, type *Terminal*, press Enter).
-2. Type **`cd `** (with a space), then **drag the `ball-labeler` folder** into the
-   Terminal window and press **Enter**.
-3. Type this and press Enter:
+1. Open **Terminal** (Cmd + Space, type *Terminal*, Enter).
+2. Type **`cd `** (with a space), **drag the folder** into the window, press **Enter**.
+3. Run:
    ```
    python3 -m http.server 8000
    ```
-4. Open your browser and go to: **http://localhost:8000**
-5. When done, close Terminal (or press **Ctrl + C**).
+4. Open your browser to **http://localhost:8000**. Stop with **Ctrl + C**.
 
 ### 🐧 Linux / Unix
-
-1. Open a **terminal** in the `ball-labeler` folder (`cd /path/to/ball-labeler`).
-2. Run:
-   ```
-   python3 -m http.server 8000
-   ```
-3. Open your browser at **http://localhost:8000**. Stop it with **Ctrl + C**.
+1. Open a terminal in the folder (`cd /path/to/folder`).
+2. Run `python3 -m http.server 8000`, then open **http://localhost:8000**. Stop with **Ctrl + C**.
 
 </details>
 
 ---
 
-## Step 3 — Label the ball
+## Step 3 — Label the video
 
-1. Click **Load video** (top-left) and choose a video file from your computer.
-2. Now label. The app is built so you can move through a whole video quickly:
+Click **Load video** (top-left) and choose a file. Then pick a mode at the top.
 
-| Do this | To mark… |
+Controls shared by every mode: **space** = play/pause, **`→`** / **`←`** = step
+forward/back, **`z`** = undo, and the **speed** buttons (1× / .5× / .25×) slow fast
+rallies down. The colored bar under the video shows everything you've labeled — click
+it to jump anywhere.
+
+### ● Ball mode — where is the ball
+| Do this | To mark |
 |---|---|
-| **Click on the ball** | the ball's position — the video then **jumps ahead a little** so you can immediately click the next one |
-| Press **`n`** | **no ball** in this frame (e.g. between points) |
-| Press **`h`** | ball is **hard to see / hidden** behind a player |
-| Press **`z`** | **undo** your last label |
-| Press **`→`** / **`←`** | skip **forward / back** without labeling |
-| Press **`space`** | play / pause the video |
+| **Click the ball** | its position — the video then **jumps ahead a little** so you can immediately click the next one |
+| **`n`** | **no ball** in this frame (between points / off-screen) |
+| **`h`** | ball is **hard to see / hidden** behind a player |
 
-Helpful bits on screen:
-- A faint **green ring** shows where you put the ball last time, so your eye can follow it.
-- The **step** box controls how far the video jumps after each click (0.30 seconds is a good default).
-- The **speed** buttons (1× / .5× / .25×) slow the video down for fast rallies.
-- The colored **bar under the video** shows everything you've labeled — click it to jump anywhere.
+A faint green ring shows your last ball so your eye can follow it. The **step** box sets
+how far it jumps after each click (0.30 s is a good default).
+
+### Actions mode — who did what
+1. Scrub to the moment of a play.
+2. **Click the player** who made it.
+3. Pick the **action**: **`s`** serve · **`a`** attack · **`b`** block · **`d`** dig · **`t`** set.
+4. Pick the **outcome** with **`1`** / **`2`** / **`3`** (e.g. attack → kill / in / error).
+
+That's it — click, one key, one key. Press **`z`** to cancel or undo.
+
+### Score mode — who won each rally
+Play the match, and each time a point is scored, press **`1`** if the **left** team won
+the rally or **`2`** if the **right** team won (or use the buttons). The running score at
+the current time is shown. Each mark is one point / one rally.
 
 **Tips for good labels**
-- **Spread them out.** Labeling many different rallies, angles, and moments is far more
-  useful than thousands of clicks from a single rally.
-- **Use `n` on dead-ball moments** (ball out of play / off-screen). These "no ball"
-  examples teach the model when *not* to guess.
+- **Spread them out** — many different rallies and situations beat thousands of clicks
+  from one rally.
+- In Ball mode, **use `n`** on dead-ball moments — the model learns when *not* to guess.
 
 ---
 
 ## Step 4 — Save / send your work
 
-Top-right, you have two ways to save:
+Top-right, two options:
 
-- **⬇ Export video + labels** *(use this to send your work to someone)* — packages
-  **your video and your labels together into one `.zip` file** (e.g.
-  `match_01_labeled.zip`). Whoever receives it gets everything they need in a single
-  file. (Large videos take a few seconds to package — you'll see a progress %.)
-- **labels .json** — saves **just the labels** (a small `match_01.json`), for when the
-  other person already has the video.
+- **⬇ Export video + labels** *(use this to send your work to someone)* — packages your
+  **video and labels into one `.zip`** (e.g. `match_01_labeled.zip`). One file has
+  everything. (Big videos take a few seconds — you'll see a progress %.)
+- **labels .json** — just the labels (small file), for when the other person already
+  has the video.
 
-Also:
-- Your work is **auto-saved inside the browser**, so if you close the tab and come back
-  to the same video, your labels are still there.
-- To continue from a saved file later, click **Import** and pick a `.json` (or a
-  `.json` you pulled out of a `.zip`).
+Your work also **auto-saves in the browser**, so closing the tab and reopening the same
+video keeps your labels. To resume from a file, click **Import** and pick a `.json`.
 
 ---
 
@@ -150,32 +151,37 @@ Also:
   "labels": [
     { "t": 6.30, "type": "ball", "x": 1187, "y": 402 },
     { "t": 6.60, "type": "ball_absent" },
-    { "t": 6.90, "type": "ball_hard" }
+    { "t": 7.10, "type": "ball_hard" },
+    { "t": 9.80, "type": "action", "x": 1040, "y": 360, "action": "attack", "outcome": "kill" },
+    { "t": 12.4, "type": "score", "scorer": "left" }
   ]
 }
 ```
 
 - `t` — time in seconds from the start of the video.
-- `type` — `ball` (with pixel position `x`,`y`), `ball_absent` (no ball), or
-  `ball_hard` (hidden/occluded).
-- `x`,`y` — the ball's pixel location in the video's original resolution (0,0 = top-left).
+- `type` — `ball` / `ball_absent` / `ball_hard` / `action` / `score`.
+- `x`,`y` — pixel location in the video's original resolution (0,0 = top-left).
+  On a `ball` it's the ball; on an `action` it's the player who made the play.
+- `action` — `serve` / `attack` / `block` / `dig` / `set`; `outcome` is that action's
+  result (e.g. `kill`, `ace`, `error`, `in`, `stuff`, `touch`, `dig`, `assist`).
+- `scorer` — `left` or `right` (which team won that rally).
 
 ---
 
 ## Common questions
 
-**Do I need internet?** No. After you have the folder, it works fully offline.
+**Do I need internet?** No. Once you have the folder, it works fully offline.
 
-**Is my video uploaded anywhere?** No. It's opened directly from your disk by the
-browser and never sent over the network. There are no accounts and no servers.
+**Is my video uploaded anywhere?** No — it's read directly from your disk and never
+sent over the network. No accounts, no servers.
 
-**Which browsers work?** Chrome, Edge, Firefox, and Safari (recent versions).
+**Which browsers work?** Chrome, Edge, Firefox, Safari (recent versions).
 
-**I lost my labels!** They auto-save per video in the browser. As long as you use the
-same browser and load the same video, they come back. Export a `.json` for safekeeping.
+**I lost my labels!** They auto-save per video in the browser. Same browser + same video
+= they come back. Export a file for safekeeping.
 
-**Nothing happens when I click the ball.** Make sure a video is loaded first (Step 3),
-and click *on the video image*, not the controls.
+**Nothing happens when I click.** Make sure a video is loaded, you're in the right mode,
+and you're clicking *on the video image* (not the buttons).
 
 ---
 

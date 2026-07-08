@@ -3,53 +3,63 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ball Labeler</title>
+<title>Volleyball Labeler</title>
 <style>
   :root{ --bg:#0f1420; --panel:#182034; --line:#26314d; --ink:#e7ecf5; --dim:#8a97b0;
-         --accent:#f5c542; --ball:#33d17a; --no:#ff6b6b; --hard:#c792ea; }
+         --accent:#f5c542; --ball:#33d17a; --no:#ff6b6b; --hard:#c792ea; --act:#4dc3ff; --score:#f5c542; }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-  header{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
+  header{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
   header h1{font-size:16px;margin:0;font-weight:700}
   header .sp{flex:1}
-  .btn{background:#22304d;border:1px solid var(--line);color:var(--ink);padding:7px 12px;border-radius:8px;cursor:pointer;font-size:13px}
+  .btn{background:#22304d;border:1px solid var(--line);color:var(--ink);padding:7px 11px;border-radius:8px;cursor:pointer;font-size:13px}
   .btn:hover{background:#2b3a5c}
   .btn.p{background:var(--accent);color:#111;border-color:var(--accent);font-weight:600}
-  .name{color:var(--dim);font-size:13px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .count{color:var(--accent);font-weight:600}
-  main{max-width:1100px;margin:0 auto;padding:16px}
+  .btn kbd{margin-left:5px;opacity:.7}
+  .name{color:var(--dim);font-size:13px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .count{color:var(--accent);font-weight:600;font-size:13px}
+  main{max-width:1100px;margin:0 auto;padding:14px 16px}
+  .modebar{display:flex;align-items:center;gap:14px;margin-bottom:12px;flex-wrap:wrap}
+  .modes{display:flex;gap:6px;background:#0e1524;border:1px solid var(--line);border-radius:10px;padding:4px}
+  .mode{background:transparent;border:0;color:var(--dim);padding:7px 15px;border-radius:7px;cursor:pointer;font-size:14px;font-weight:600}
+  .mode.on{background:var(--accent);color:#111}
+  .mhint{color:var(--dim);font-size:13px}
   .stage{position:relative;background:#000;border-radius:10px;overflow:hidden;line-height:0}
-  .stage video{width:100%;display:block;max-height:70vh;object-fit:contain}
+  .stage video{width:100%;display:block;max-height:66vh;object-fit:contain}
   .stage canvas{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair}
-  .empty{display:flex;align-items:center;justify-content:center;min-height:340px;color:var(--dim);text-align:center;padding:30px;line-height:1.7}
+  .empty{display:flex;align-items:center;justify-content:center;min-height:320px;color:var(--dim);text-align:center;padding:30px;line-height:1.7}
   .empty b{color:var(--ink)}
   .bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
   .bar label{color:var(--dim);font-size:12px}
-  .bar input[type=number]{width:60px;background:#0e1524;border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:5px 6px}
+  .bar input[type=number]{width:58px;background:#0e1524;border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:5px 6px}
   .seg{display:flex;gap:4px}
-  .seg .btn{padding:6px 9px}
-  .seg .btn.on{background:var(--accent);color:#111;border-color:var(--accent)}
+  .seg .btn{padding:6px 9px} .seg .btn.on{background:var(--accent);color:#111;border-color:var(--accent)}
+  .panel{margin-top:12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .panel b{margin-right:6px}
+  .panel .big{font-size:20px;font-weight:700}
+  .panel .dim{color:var(--dim)}
+  .scorebox{font-size:22px;font-weight:800;letter-spacing:1px}
+  .scorebox .l{color:#7fd1ff} .scorebox .r{color:#ffab7f}
   .hint{margin-top:12px;color:var(--dim);font-size:13px;line-height:2}
-  .hint kbd{background:#0e1524;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 7px;color:var(--ink);font-family:ui-monospace,monospace;font-size:12px}
+  kbd{background:#0e1524;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 7px;color:var(--ink);font-family:ui-monospace,monospace;font-size:12px}
   .hint .b{color:var(--ball)} .hint .n{color:var(--no)} .hint .h{color:var(--hard)}
   .cov{margin-top:12px}
-  .cov .track{height:12px;background:#0e1524;border:1px solid var(--line);border-radius:6px;position:relative;overflow:hidden}
-  .cov .track i{position:absolute;top:0;bottom:0;width:2px;background:var(--ball)}
-  .cov .track i.no{background:var(--no)} .cov .track i.hard{background:var(--hard)}
+  .cov .track{height:14px;background:#0e1524;border:1px solid var(--line);border-radius:6px;position:relative;overflow:hidden;cursor:pointer}
+  .cov .track i{position:absolute;top:0;bottom:0;width:2px}
   .cov .meta{display:flex;justify-content:space-between;color:var(--dim);font-size:12px;margin-top:5px}
   .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#20304d;border:1px solid var(--line);
-         padding:9px 16px;border-radius:9px;font-size:13px;opacity:0;transition:opacity .18s;pointer-events:none}
+         padding:9px 16px;border-radius:9px;font-size:13px;opacity:0;transition:opacity .18s;pointer-events:none;z-index:9}
   .toast.show{opacity:1}
   a.dl{display:none}
 </style>
 </head>
 <body>
 <header>
-  <h1>🏐 Ball Labeler</h1>
+  <h1>🏐 Volleyball Labeler</h1>
   <button class="btn p" onclick="filePick.click()">Load video</button>
   <span class="name" id="vname">no video loaded</span>
   <span class="sp"></span>
-  <span class="count"><span id="cnt">0</span> labels</span>
+  <span class="count" id="cnt">—</span>
   <button class="btn" onclick="jsonPick.click()">Import</button>
   <button class="btn" onclick="exportJSON()" title="labels only, no video">labels .json</button>
   <button class="btn p" onclick="exportBundle()" title="video + labels in one file to send">⬇ Export video + labels</button>
@@ -59,11 +69,20 @@
 </header>
 
 <main>
+  <div class="modebar">
+    <div class="modes">
+      <button class="mode on" data-m="ball" onclick="setMode('ball')">● Ball</button>
+      <button class="mode" data-m="action" onclick="setMode('action')">Actions</button>
+      <button class="mode" data-m="score" onclick="setMode('score')">Score</button>
+    </div>
+    <div class="mhint" id="mhint"></div>
+  </div>
+
   <div class="stage" id="stage">
     <div class="empty" id="empty">
-      <div><b>Load a video</b> to start labeling the ball.<br>
+      <div><b>Load a video</b> to start labeling.<br>
       Everything runs in your browser — your video never leaves this machine.<br>
-      Click the ball each step; it auto-advances so you can label continuously.</div>
+      Switch modes above: <b>Ball</b> position · <b>Actions</b> (who did what) · <b>Score</b> (who won each rally).</div>
     </div>
     <video id="vid" playsinline style="display:none"></video>
     <canvas id="cv" style="display:none"></canvas>
@@ -79,18 +98,22 @@
       <button class="btn spd" data-s="0.5">.5×</button>
       <button class="btn spd" data-s="0.25">.25×</button>
     </div>
-    <label><input type="checkbox" id="auto" checked> auto-advance after each label</label>
-    <label><input type="checkbox" id="ghost" checked> show last ball</label>
+    <label id="autowrap"><input type="checkbox" id="auto" checked> auto-advance after each label</label>
+    <label id="ghostwrap"><input type="checkbox" id="ghost" checked> show last ball</label>
   </div>
 
-  <div class="hint">
-    <kbd>click</kbd> <span class="b">ball here</span> &nbsp;·&nbsp;
-    <kbd>n</kbd> <span class="n">no ball in frame</span> &nbsp;·&nbsp;
-    <kbd>h</kbd> <span class="h">hard / occluded</span> &nbsp;·&nbsp;
-    <kbd>space</kbd> play/pause &nbsp;·&nbsp;
-    <kbd>→</kbd> skip fwd &nbsp;·&nbsp; <kbd>←</kbd> back &nbsp;·&nbsp;
-    <kbd>z</kbd> undo last
+  <!-- Actions mode panel -->
+  <div class="panel" id="panel-action" style="display:none"></div>
+  <!-- Score mode panel -->
+  <div class="panel" id="panel-score" style="display:none">
+    <div class="scorebox"><span class="l" id="scoreL">0</span> &nbsp;—&nbsp; <span class="r" id="scoreR">0</span></div>
+    <span class="dim">score at current time</span>
+    <span class="sp" style="flex:1"></span>
+    <button class="btn" style="font-size:15px" onclick="addScore('left')">◀ LEFT won rally <kbd>1</kbd></button>
+    <button class="btn" style="font-size:15px" onclick="addScore('right')">RIGHT won rally ▶ <kbd>2</kbd></button>
   </div>
+
+  <div class="hint" id="khint"></div>
 
   <div class="cov">
     <div class="track" id="track"></div>
@@ -104,175 +127,208 @@
 "use strict";
 const $=id=>document.getElementById(id);
 const vid=$('vid'), cv=$('cv'), ctx=cv.getContext('2d');
-let videoName="", videoFile=null, labels=[], lastToast=0;
+let videoName="", videoFile=null, labels=[], lastToast=0, mode='ball', pending=null;
 
-// ---------- persistence (localStorage, keyed by video name) ----------
-const KEY=n=>"balllabeler:"+n;
+const ACTIONS={ serve:['ace','in','error'], attack:['kill','in','error'], block:['stuff','touch','error'], dig:['dig','error'], set:['assist','in'] };
+const ACTKEY={ s:'serve', a:'attack', b:'block', d:'dig', t:'set' };
+const COLORS={ ball:'#33d17a', ball_absent:'#ff6b6b', ball_hard:'#c792ea', action:'#4dc3ff', score:'#f5c542' };
+const MHINT={ ball:'Click the ball each step — it auto-advances so you can label continuously.',
+             action:'Scrub to a play, click the player who made it, then pick the action and its outcome.',
+             score:'Play the match and mark each point as the team that won the rally.' };
+const KHINT={
+  ball:'<kbd>click</kbd> <span class="b">ball</span> · <kbd>n</kbd> <span class="n">no ball</span> · <kbd>h</kbd> <span class="h">hard</span> · <kbd>space</kbd> play/pause · <kbd>&rarr;</kbd>/<kbd>&larr;</kbd> step · <kbd>z</kbd> undo',
+  action:'<kbd>click</kbd> the player, then <kbd>s</kbd>erve <kbd>a</kbd>ttack <kbd>b</kbd>lock <kbd>d</kbd>ig se<kbd>t</kbd>, then <kbd>1</kbd>/<kbd>2</kbd>/<kbd>3</kbd> outcome · <kbd>z</kbd> undo/cancel · <kbd>space</kbd> play · <kbd>&rarr;</kbd>/<kbd>&larr;</kbd> step',
+  score:'<kbd>1</kbd> left team won the rally · <kbd>2</kbd> right team won · <kbd>z</kbd> undo · <kbd>space</kbd> play/pause · <kbd>&rarr;</kbd>/<kbd>&larr;</kbd> step' };
+
+// ---------- persistence ----------
+const KEY=n=>"vballlabeler:"+n;
 function save(){ if(videoName) try{ localStorage.setItem(KEY(videoName), JSON.stringify(labels)); }catch(e){} render(); }
-function load(){ if(!videoName) return; try{ const s=localStorage.getItem(KEY(videoName)); labels=s?JSON.parse(s):[]; }catch(e){ labels=[]; } render(); }
+function loadStore(){ if(!videoName) return; try{ const s=localStorage.getItem(KEY(videoName)); labels=s?JSON.parse(s):[]; }catch(e){ labels=[]; } render(); }
 
-// ---------- video loading ----------
+// ---------- video ----------
 $('filePick').onchange=e=>{ const f=e.target.files[0]; if(f) openVideo(f); };
 function openVideo(file){
-  videoName=file.name.replace(/\.[^.]+$/,'');
-  videoFile=file;
-  vid.src=URL.createObjectURL(file);
-  $('vname').textContent=file.name;
+  videoName=file.name.replace(/\.[^.]+$/,''); videoFile=file;
+  vid.src=URL.createObjectURL(file); $('vname').textContent=file.name;
   $('empty').style.display='none'; vid.style.display='block'; cv.style.display='block';
-  vid.onloadedmetadata=()=>{ sizeCanvas(); load(); vid.pause(); };
+  vid.onloadedmetadata=()=>{ cv.width=vid.videoWidth||1920; cv.height=vid.videoHeight||1080; loadStore(); vid.pause(); };
 }
-function sizeCanvas(){ cv.width=vid.videoWidth||1920; cv.height=vid.videoHeight||1080; }
-window.addEventListener('resize', ()=>{});
 
-// ---------- labeling ----------
+// ---------- modes ----------
+function setMode(m){ mode=m; pending=null;
+  document.querySelectorAll('.mode').forEach(b=>b.classList.toggle('on', b.dataset.m===m));
+  $('mhint').textContent=MHINT[m]; $('khint').innerHTML=KHINT[m];
+  $('panel-action').style.display=m==='action'?'flex':'none';
+  $('panel-score').style.display=m==='score'?'flex':'none';
+  $('autowrap').style.display=m==='ball'?'':'none';
+  $('ghostwrap').style.display=m==='ball'?'':'none';
+  if(m==='action') renderActionPanel(); if(m==='score') renderScorePanel();
+}
+
+// ---------- labeling helpers ----------
 function stepSize(){ return Math.max(0.03, parseFloat($('step').value)||0.3); }
 function now(){ return Math.round(vid.currentTime*1000)/1000; }
-function addLabel(type, x, y){
-  if(!vid.src) return;
-  const t=now(), tol=stepSize()*0.4;
-  labels=labels.filter(l=>Math.abs(l.t-t)>tol);           // replace any label at ~this time
-  const l={t, type}; if(x!=null){ l.x=Math.round(x); l.y=Math.round(y); }
-  labels.push(l); labels.sort((a,b)=>a.t-b.t);
-  save();
+function pushLabel(l, replaceTol){ if(!vid.src) return;
+  if(replaceTol!=null) labels=labels.filter(x=>!(x.type===l.type && Math.abs(x.t-l.t)<=replaceTol));
+  labels.push(l); labels.sort((a,b)=>a.t-b.t); save(); }
+
+function addBall(type,x,y){ const t=now(), l={t,type}; if(x!=null){l.x=Math.round(x);l.y=Math.round(y);}
+  labels=labels.filter(x=>!( (x.type==='ball'||x.type==='ball_absent'||x.type==='ball_hard') && Math.abs(x.t-t)<=stepSize()*0.4));
+  labels.push(l); labels.sort((a,b)=>a.t-b.t); save();
   toast(type==='ball'?`ball (${l.x}, ${l.y})`:type==='ball_absent'?'no ball':'hard');
-  if($('auto').checked) step(stepSize());
-}
+  if($('auto').checked) step(stepSize()); }
+
+// actions: click player -> pick action -> pick outcome
+function clickPlayer(x,y){ pending={x:Math.round(x),y:Math.round(y)}; renderActionPanel(); toast('player set — pick the action'); }
+function pickAction(a){ if(!pending)return; pending.action=a; renderActionPanel(); }
+function pickOutcome(o){ if(!pending||!pending.action)return;
+  pushLabel({t:now(), type:'action', x:pending.x, y:pending.y, action:pending.action, outcome:o});
+  toast(`${pending.action} → ${o}`); pending=null; renderActionPanel(); }
+function cancelPending(){ pending=null; renderActionPanel(); }
+function renderActionPanel(){ const p=$('panel-action');
+  if(!pending){ p.innerHTML='<span class="dim">Click the player who made the play →</span>'; return; }
+  if(!pending.action){ p.innerHTML='<b>Pick action</b>'+Object.entries(ACTKEY).map(([k,a])=>
+      `<button class="btn" onclick="pickAction('${a}')">${a}<kbd>${k}</kbd></button>`).join('')
+    +'<button class="btn" onclick="cancelPending()">cancel<kbd>z</kbd></button>'; return; }
+  p.innerHTML=`<b>${pending.action} — outcome</b>`+ACTIONS[pending.action].map((o,i)=>
+      `<button class="btn" onclick="pickOutcome('${o}')">${o}<kbd>${i+1}</kbd></button>`).join('')
+    +'<button class="btn" onclick="pending.action=null;renderActionPanel()">back</button>'; }
+
+// score: mark who won each rally
+function scoreAt(t){ let l=0,r=0; for(const x of labels) if(x.type==='score'&&x.t<=t+1e-6){ x.scorer==='left'?l++:r++; } return [l,r]; }
+function addScore(side){ pushLabel({t:now(), type:'score', scorer:side}); toast(side==='left'?'◀ left point':'right point ▶'); renderScorePanel(); }
+function renderScorePanel(){ const [l,r]=scoreAt(vid.currentTime); $('scoreL').textContent=l; $('scoreR').textContent=r; }
+
 function undo(){
+  if(mode==='action'&&pending){ cancelPending(); return; }
   if(!labels.length) return;
-  // undo the label nearest to (and at/just before) current time, else the last one
-  let idx=labels.length-1;
-  const t=now();
-  for(let i=0;i<labels.length;i++) if(labels[i].t<=t+1e-6) idx=i;
+  const kinds = mode==='ball'?['ball','ball_absent','ball_hard'] : mode==='action'?['action'] : ['score'];
+  let idx=-1, t=now();
+  for(let i=0;i<labels.length;i++) if(kinds.includes(labels[i].type) && labels[i].t<=t+1e-6) idx=i;
+  if(idx<0) for(let i=0;i<labels.length;i++) if(kinds.includes(labels[i].type)) idx=i;   // else last of this kind
+  if(idx<0) return;
   const l=labels.splice(idx,1)[0]; save();
-  if(l){ vid.currentTime=l.t; toast('undid '+l.type); }
+  if(l){ vid.currentTime=l.t; toast('undid '+(l.type==='action'?l.action:l.type)); if(mode==='score')renderScorePanel(); }
 }
-function step(dt){ if(!vid.src) return; vid.pause(); setPlayBtn(); vid.currentTime=clamp(vid.currentTime+dt,0,vid.duration||0); }
+function step(dt){ if(!vid.src) return; vid.pause(); setPlayBtn(); vid.currentTime=clamp(vid.currentTime+dt,0,vid.duration||0); if(mode==='score')renderScorePanel(); }
 function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
 
-// canvas click -> ball position in native video pixels
+// canvas click -> dispatch by mode
 cv.addEventListener('click', e=>{
   const r=cv.getBoundingClientRect();
   const x=(e.clientX-r.left)/r.width*cv.width, y=(e.clientY-r.top)/r.height*cv.height;
-  addLabel('ball', x, y);
+  if(mode==='ball') addBall('ball',x,y);
+  else if(mode==='action') clickPlayer(x,y);
 });
 
 // ---------- transport ----------
-function playpause(){ if(vid.paused){ vid.play(); } else { vid.pause(); } setPlayBtn(); }
+function playpause(){ vid.paused?vid.play():vid.pause(); setPlayBtn(); }
 function setPlayBtn(){ $('playbtn').textContent = vid.paused?'▶︎ Play':'❚❚ Pause'; }
-vid.addEventListener('play', setPlayBtn); vid.addEventListener('pause', setPlayBtn);
-document.querySelectorAll('.spd').forEach(b=>b.onclick=()=>{
-  document.querySelectorAll('.spd').forEach(x=>x.classList.remove('on')); b.classList.add('on');
-  vid.playbackRate=parseFloat(b.dataset.s);
-});
+vid.addEventListener('play',setPlayBtn); vid.addEventListener('pause',setPlayBtn);
+vid.addEventListener('timeupdate',()=>{ if(mode==='score')renderScorePanel(); });
+document.querySelectorAll('.spd').forEach(b=>b.onclick=()=>{ document.querySelectorAll('.spd').forEach(x=>x.classList.remove('on')); b.classList.add('on'); vid.playbackRate=parseFloat(b.dataset.s); });
 
 // ---------- keyboard ----------
 window.addEventListener('keydown', e=>{
-  if(e.target.tagName==='INPUT') return;
-  if(!vid.src) return;
+  if(e.target.tagName==='INPUT') return; if(!vid.src) return;
   const k=e.key.toLowerCase();
-  if(k==='n'){ e.preventDefault(); addLabel('ball_absent',null); }
-  else if(k==='h'){ e.preventDefault(); addLabel('ball_hard',null); }
-  else if(k==='z'){ e.preventDefault(); undo(); }
-  else if(k===' '){ e.preventDefault(); playpause(); }
-  else if(k==='arrowright'){ e.preventDefault(); step(stepSize()); }
-  else if(k==='arrowleft'){ e.preventDefault(); step(-stepSize()); }
-  else if(k===','){ e.preventDefault(); step(-0.1); }
-  else if(k==='.'){ e.preventDefault(); step(0.1); }
+  if(k==='z'){ e.preventDefault(); undo(); return; }
+  if(k===' '){ e.preventDefault(); playpause(); return; }
+  if(k==='arrowright'){ e.preventDefault(); step(stepSize()); return; }
+  if(k==='arrowleft'){ e.preventDefault(); step(-stepSize()); return; }
+  if(k===','){ e.preventDefault(); step(-0.1); return; }
+  if(k==='.'){ e.preventDefault(); step(0.1); return; }
+  if(mode==='ball'){ if(k==='n'){e.preventDefault();addBall('ball_absent',null);} else if(k==='h'){e.preventDefault();addBall('ball_hard',null);} }
+  else if(mode==='action'){
+    if(!pending) return;
+    if(!pending.action){ if(ACTKEY[k]){ e.preventDefault(); pickAction(ACTKEY[k]); } }
+    else { const outs=ACTIONS[pending.action]; const i=parseInt(k)-1; if(i>=0&&i<outs.length){ e.preventDefault(); pickOutcome(outs[i]); } }
+  }
+  else if(mode==='score'){ if(k==='1'){e.preventDefault();addScore('left');} else if(k==='2'){e.preventDefault();addScore('right');} }
 });
 
 // ---------- overlay draw ----------
-function labelAt(t){ const tol=stepSize()*0.4; let best=null,bd=1e9;
-  for(const l of labels){ const d=Math.abs(l.t-t); if(d<tol&&d<bd){bd=d;best=l;} } return best; }
-function prevBall(t){ let best=null; for(const l of labels){ if(l.type==='ball'&&l.t<t-1e-6){ if(!best||l.t>best.t) best=l; } } return best; }
+function nearLabels(t,types){ const tol=Math.max(stepSize()*0.4,0.15); return labels.filter(l=>types.includes(l.type)&&Math.abs(l.t-t)<tol); }
+function prevBall(t){ let best=null; for(const l of labels) if(l.type==='ball'&&l.t<t-1e-6){ if(!best||l.t>best.t)best=l; } return best; }
+function ring(x,y,rad,col,w){ ctx.strokeStyle=col; ctx.lineWidth=w||3; ctx.beginPath(); ctx.arc(x,y,rad,0,7); ctx.stroke(); }
 function draw(){
   requestAnimationFrame(draw);
   if(!vid.src||!cv.width) return;
-  ctx.clearRect(0,0,cv.width,cv.height);
-  const t=vid.currentTime;
-  // ghost of the previous ball (helps your eye follow it)
-  if($('ghost').checked){ const p=prevBall(t); if(p){ ctx.strokeStyle='rgba(51,209,122,.35)'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(p.x,p.y,11,0,7); ctx.stroke(); } }
-  // current-frame label
-  const l=labelAt(t);
-  if(l){
-    if(l.type==='ball'){ ctx.strokeStyle='#33d17a'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(l.x,l.y,13,0,7); ctx.stroke();
-      ctx.fillStyle='#33d17a'; ctx.beginPath(); ctx.arc(l.x,l.y,3,0,7); ctx.fill(); }
-    else { const c=l.type==='ball_absent'?'#ff6b6b':'#c792ea'; ctx.fillStyle=c;
-      ctx.font='bold 26px system-ui'; ctx.fillText(l.type==='ball_absent'?'NO BALL':'HARD', 20, 40); }
+  ctx.clearRect(0,0,cv.width,cv.height); const t=vid.currentTime;
+  if(mode==='ball'){
+    if($('ghost').checked){ const p=prevBall(t); if(p){ ring(p.x,p.y,11,'rgba(51,209,122,.35)',2); } }
+    for(const l of nearLabels(t,['ball','ball_absent','ball_hard'])){
+      if(l.type==='ball'){ ring(l.x,l.y,13,'#33d17a',3); ctx.fillStyle='#33d17a'; ctx.beginPath(); ctx.arc(l.x,l.y,3,0,7); ctx.fill(); }
+      else { ctx.fillStyle=l.type==='ball_absent'?'#ff6b6b':'#c792ea'; ctx.font='bold 26px system-ui'; ctx.fillText(l.type==='ball_absent'?'NO BALL':'HARD',20,40); } }
+  } else if(mode==='action'){
+    for(const l of nearLabels(t,['action'])){ ring(l.x,l.y,14,'#4dc3ff',3); ctx.fillStyle='#4dc3ff'; ctx.font='bold 16px system-ui';
+      ctx.fillText(`${l.action} · ${l.outcome}`, l.x+18, l.y+5); }
+    if(pending){ const pulse=6+4*Math.sin(Date.now()/140); ring(pending.x,pending.y,12+pulse,'#f5c542',3);
+      ctx.fillStyle='#f5c542'; ctx.font='bold 15px system-ui'; ctx.fillText(pending.action?('pick outcome'):'pick action', pending.x+18, pending.y+5); }
   }
   $('timetxt').textContent=t.toFixed(2)+'s / '+((vid.duration||0).toFixed(0))+'s';
 }
 requestAnimationFrame(draw);
 
-// ---------- coverage strip + count ----------
+// ---------- coverage + count ----------
 function render(){
-  $('cnt').textContent=labels.length;
+  const c={ball:0,ball_absent:0,ball_hard:0,action:0,score:0}; for(const l of labels) c[l.type]=(c[l.type]||0)+1;
+  $('cnt').textContent=`${c.ball} ball · ${c.action} action · ${c.score} score`;
   const dur=vid.duration||0, tr=$('track'); tr.innerHTML='';
-  if(dur){ for(const l of labels){ const i=document.createElement('i');
-    i.style.left=(l.t/dur*100)+'%'; if(l.type==='ball_absent')i.className='no'; else if(l.type==='ball_hard')i.className='hard'; tr.appendChild(i); } }
-  const nb=labels.filter(l=>l.type==='ball').length, no=labels.filter(l=>l.type==='ball_absent').length, hd=labels.length-nb-no;
-  $('covtxt').textContent=`${nb} ball · ${no} no-ball · ${hd} hard`;
+  if(dur) for(const l of labels){ const i=document.createElement('i'); i.style.left=(l.t/dur*100)+'%'; i.style.background=COLORS[l.type]||'#888'; tr.appendChild(i); }
+  $('covtxt').textContent=`${c.ball} ball · ${c.ball_absent} no-ball · ${c.ball_hard} hard · ${c.action} action · ${c.score} score`;
 }
-// clicking the coverage strip seeks there
 $('track').addEventListener('click', e=>{ const r=e.currentTarget.getBoundingClientRect(); const f=(e.clientX-r.left)/r.width; if(vid.duration) step(f*vid.duration - vid.currentTime); });
 
 // ---------- export / import ----------
-function exportJSON(){
-  if(!videoName){ toast('load a video first'); return; }
-  const data={ video:videoName, labels: labels.map(l=>({t:l.t, type:l.type, ...(l.x!=null?{x:l.x,y:l.y}:{})})) };
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const a=$('dl'); a.href=URL.createObjectURL(blob); a.download=videoName+'.json'; a.click();
-  toast('exported '+videoName+'.json');
-}
+function exportData(){ return { video:videoName, labels: labels.map(l=>{ const o={t:l.t,type:l.type};
+  if(l.x!=null){o.x=l.x;o.y=l.y;} if(l.action){o.action=l.action;o.outcome=l.outcome;} if(l.scorer){o.scorer=l.scorer;} return o; }) }; }
+function exportJSON(){ if(!videoName){ toast('load a video first'); return; }
+  const blob=new Blob([JSON.stringify(exportData(),null,2)],{type:'application/json'});
+  const a=$('dl'); a.href=URL.createObjectURL(blob); a.download=videoName+'.json'; a.click(); toast('exported '+videoName+'.json'); }
+$('jsonPick').onchange=e=>{ const f=e.target.files[0]; if(!f) return;
+  const rd=new FileReader(); rd.onload=()=>{ try{ const d=JSON.parse(rd.result);
+    labels=(d.labels||[]).filter(l=>l&&typeof l.t==='number'); labels.sort((a,b)=>a.t-b.t); save();
+    if(mode==='score')renderScorePanel(); toast('imported '+labels.length+' labels'); }catch(err){ toast('bad json'); } }; rd.readAsText(f); };
+
 // ---- bundle export: video + labels.json as one .zip (no library, streams the video) ----
 let _crcT=null;
 function crcTable(){ if(_crcT) return _crcT; _crcT=new Uint32Array(256);
   for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1); _crcT[n]=c>>>0; } return _crcT; }
-async function crc32(blob, onProg){ const t=crcTable(); let c=0xFFFFFFFF; const CH=8<<20;   // 8MB chunks
+async function crc32(blob,onProg){ const t=crcTable(); let c=0xFFFFFFFF; const CH=8<<20;
   for(let off=0; off<blob.size; off+=CH){ const b=new Uint8Array(await blob.slice(off,off+CH).arrayBuffer());
     for(let i=0;i<b.length;i++) c=(c>>>8)^t[(c^b[i])&0xFF]; if(onProg) onProg(Math.min(off+CH,blob.size)); }
-  return (blob.size?((c^0xFFFFFFFF)>>>0):0); }
+  return blob.size?((c^0xFFFFFFFF)>>>0):0; }
 const u16=n=>[n&0xFF,(n>>>8)&0xFF], u32=n=>[n&0xFF,(n>>>8)&0xFF,(n>>>16)&0xFF,(n>>>24)&0xFF];
 function bytes(...groups){ const a=[]; for(const g of groups) for(const b of g) a.push(b&0xFF); return a; }
 function dosDT(d){ return { time:(((d.getHours()&31)<<11)|((d.getMinutes()&63)<<5)|((d.getSeconds()>>1)&31))&0xFFFF,
   date:((((d.getFullYear()-1980)&127)<<9)|(((d.getMonth()+1)&15)<<5)|(d.getDate()&31))&0xFFFF }; }
-async function makeZip(entries, onProg){
-  const enc=new TextEncoder(), dt=dosDT(new Date());
-  const parts=[], central=[]; let offset=0, doneBytes=0;
-  const total=entries.reduce((s,e)=>s+e.blob.size,0);
-  for(const e of entries){
-    const nb=enc.encode(e.name), size=e.blob.size;
-    const crc=await crc32(e.blob, r=>onProg&&onProg(doneBytes+r, total)); doneBytes+=size;
+async function makeZip(entries,onProg){ const enc=new TextEncoder(), dt=dosDT(new Date());
+  const parts=[], central=[]; let offset=0, doneBytes=0; const total=entries.reduce((s,e)=>s+e.blob.size,0);
+  for(const e of entries){ const nb=enc.encode(e.name), size=e.blob.size;
+    const crc=await crc32(e.blob, r=>onProg&&onProg(doneBytes+r,total)); doneBytes+=size;
     const lh=new Uint8Array(bytes(u32(0x04034b50),u16(20),u16(0),u16(0),u16(dt.time),u16(dt.date),u32(crc),u32(size),u32(size),u16(nb.length),u16(0)).concat([...nb]));
-    parts.push(lh, e.blob);
+    parts.push(lh,e.blob);
     central.push(new Uint8Array(bytes(u32(0x02014b50),u16(20),u16(20),u16(0),u16(0),u16(dt.time),u16(dt.date),u32(crc),u32(size),u32(size),u16(nb.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(offset)).concat([...nb])));
-    offset += lh.length + size;
-  }
+    offset+=lh.length+size; }
   const cdSize=central.reduce((s,c)=>s+c.length,0);
   const eocd=new Uint8Array(bytes(u32(0x06054b50),u16(0),u16(0),u16(central.length),u16(central.length),u32(cdSize),u32(offset),u16(0)));
-  return new Blob([...parts, ...central, eocd], {type:'application/zip'});
-}
-async function exportBundle(){
-  if(!videoFile){ toast('load a video first'); return; }
-  if(videoFile.size >= 0xFFFFFFFF){ toast('video >4GB — use “labels .json” and send the video separately'); return; }
-  const data={ video:videoName, labels: labels.map(l=>({t:l.t, type:l.type, ...(l.x!=null?{x:l.x,y:l.y}:{})})) };
-  const jsonBlob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  return new Blob([...parts,...central,eocd],{type:'application/zip'}); }
+async function exportBundle(){ if(!videoFile){ toast('load a video first'); return; }
+  if(videoFile.size>=0xFFFFFFFF){ toast('video >4GB — use “labels .json” and send the video separately'); return; }
+  const jsonBlob=new Blob([JSON.stringify(exportData(),null,2)],{type:'application/json'});
   toast('packaging video + labels… 0%');
-  try{
-    const zip=await makeZip([{name:videoFile.name, blob:videoFile}, {name:videoName+'.json', blob:jsonBlob}],
-      (done,total)=>toast('packaging video + labels… '+Math.round(done/total*100)+'%'));
+  try{ const zip=await makeZip([{name:videoFile.name,blob:videoFile},{name:videoName+'.json',blob:jsonBlob}],
+        (done,total)=>toast('packaging video + labels… '+Math.round(done/total*100)+'%'));
     const a=$('dl'); a.href=URL.createObjectURL(zip); a.download=videoName+'_labeled.zip'; a.click();
-    toast('saved '+videoName+'_labeled.zip  ✓');
-  }catch(err){ toast('packaging failed — try “labels .json” instead'); }
-}
-
-$('jsonPick').onchange=e=>{ const f=e.target.files[0]; if(!f) return;
-  const rd=new FileReader(); rd.onload=()=>{ try{ const d=JSON.parse(rd.result);
-    labels=(d.labels||[]).filter(l=>l&&typeof l.t==='number'); labels.sort((a,b)=>a.t-b.t); save();
-    toast('imported '+labels.length+' labels'); }catch(err){ toast('bad json'); } }; rd.readAsText(f); };
+    toast('saved '+videoName+'_labeled.zip  ✓'); }
+  catch(err){ toast('packaging failed — try “labels .json” instead'); } }
 
 // ---------- toast ----------
 function toast(m){ const el=$('toast'); el.textContent=m; el.classList.add('show'); const id=++lastToast;
-  setTimeout(()=>{ if(id===lastToast) el.classList.remove('show'); }, 1100); }
+  setTimeout(()=>{ if(id===lastToast) el.classList.remove('show'); },1100); }
+
+setMode('ball');
 </script>
 </body>
 </html>
