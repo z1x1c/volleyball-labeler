@@ -435,9 +435,12 @@ function delLabel(l){ const i=labels.indexOf(l); if(i<0) return; labels.splice(i
 // ---------- export / import ----------
 function exportData(){ return { video:videoName, orientation: courtOri==='lr'?'left-right':'top-bottom', labels: labels.map(l=>{ const o={t:l.t,type:l.type};
   if(l.x!=null){o.x=l.x;o.y=l.y;} if(l.action){o.action=l.action;o.outcome=l.outcome;} if(l.scorer){o.scorer=l.scorer;} return o; }) }; }
-function exportJSON(){ if(!videoName){ toast('load a video first'); return; }
+function downloadBlob(blob, name){ const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=name; a.style.display='none';
+  document.body.appendChild(a); a.click(); setTimeout(()=>{ a.remove(); URL.revokeObjectURL(url); }, 4000); }
+function exportJSON(){ if(!videoName){ toast('⚠ Load a video first, then Export.', 3500); return; }
   const blob=new Blob([JSON.stringify(exportData(),null,2)],{type:'application/json'});
-  const a=$('dl'); a.href=URL.createObjectURL(blob); a.download=videoName+'.json'; a.click(); toast('exported '+videoName+'.json'); }
+  downloadBlob(blob, videoName+'.json'); toast('⬇ exported '+videoName+'.json', 2500); }
 $('jsonPick').onchange=e=>{ const f=e.target.files[0]; if(!f) return;
   const rd=new FileReader(); rd.onload=()=>{ try{ const d=JSON.parse(rd.result);
     labels=(d.labels||[]).filter(l=>l&&typeof l.t==='number'); labels.sort((a,b)=>a.t-b.t);
@@ -467,19 +470,18 @@ async function makeZip(entries,onProg){ const enc=new TextEncoder(), dt=dosDT(ne
   const cdSize=central.reduce((s,c)=>s+c.length,0);
   const eocd=new Uint8Array(bytes(u32(0x06054b50),u16(0),u16(0),u16(central.length),u16(central.length),u32(cdSize),u32(offset),u16(0)));
   return new Blob([...parts,...central,eocd],{type:'application/zip'}); }
-async function exportBundle(){ if(!videoFile){ toast('load a video first'); return; }
+async function exportBundle(){ if(!videoFile){ toast('⚠ Load a video first, then Export.', 3500); return; }
   if(videoFile.size>=0xFFFFFFFF){ toast('video >4GB — use “labels .json” and send the video separately'); return; }
   const jsonBlob=new Blob([JSON.stringify(exportData(),null,2)],{type:'application/json'});
   toast('packaging video + labels… 0%');
   try{ const zip=await makeZip([{name:videoFile.name,blob:videoFile},{name:videoName+'.json',blob:jsonBlob}],
         (done,total)=>toast('packaging video + labels… '+Math.round(done/total*100)+'%'));
-    const a=$('dl'); a.href=URL.createObjectURL(zip); a.download=videoName+'_labeled.zip'; a.click();
-    toast('saved '+videoName+'_labeled.zip  ✓'); }
-  catch(err){ toast('packaging failed — try “labels .json” instead'); } }
+    downloadBlob(zip, videoName+'_labeled.zip'); toast('⬇ saved '+videoName+'_labeled.zip  ✓', 3000); }
+  catch(err){ toast('packaging failed — use “labels .json” and send the video separately', 3500); } }
 
 // ---------- toast ----------
-function toast(m){ const el=$('toast'); el.textContent=m; el.classList.add('show'); const id=++lastToast;
-  setTimeout(()=>{ if(id===lastToast) el.classList.remove('show'); },1100); }
+function toast(m, ms){ const el=$('toast'); el.textContent=m; el.classList.add('show'); const id=++lastToast;
+  setTimeout(()=>{ if(id===lastToast) el.classList.remove('show'); }, ms||1100); }
 
 setMode('ball');
 </script>
