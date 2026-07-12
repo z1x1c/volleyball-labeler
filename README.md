@@ -128,10 +128,17 @@ how far it jumps after each click (0.30 s is a good default).
 ### Actions mode — who did what
 1. **Pause at the moment of contact** (the spike hit, the serve toss-contact, the block touch).
 2. **Click the player** who made the play.
-3. Pick the **action**: **`s`** serve · **`a`** attack · **`b`** block · **`d`** dig ·
-   **`t`** set · **`o`** other.
-4. Pick the **outcome** with **`1`**, **`2`**, **`3`**… — e.g. attack → kill / in / error,
-   set → assist / kill / in / out / error.
+3. Pick the **action**: **`s`** serve · **`r`** receive · **`a`** attack · **`b`** block ·
+   **`d`** dig · **`t`** set · **`o`** other. (**Receive** = serve-receive / passing, tracked
+   separately from a **Dig**, which is defending an attack.)
+4. Pick the **outcome** with **`1`**, **`2`**, **`3`**… — e.g. serve → ace / effective / bad /
+   error; receive & dig → perfect / good / in / error / kill; attack → kill / in / error.
+
+> **Quality grades are future insurance.** The perfect/good/effective/bad ratings are
+> *saved*, but a model treats them as one bucket for now — what changes a rally is only
+> **point** (ace/kill/stuff/assist), **kept in play** (effective/bad/perfect/good/in/touch/
+> dig), or **error/out**. Label the quality if you like; it's there when a finer model is
+> worth training, and ignored until then. If it slows you down, just use in/error/kill.
 
 **`o` Other — rule-break faults off the ball.** Some rallies end because a player who
 *wasn't* playing the ball broke a rule (a net touch, a foot over the line, etc.) — no
