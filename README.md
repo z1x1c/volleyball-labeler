@@ -132,13 +132,15 @@ how far it jumps after each click (0.30 s is a good default).
    **`d`** dig · **`t`** set · **`o`** other. (**Receive** = serve-receive / passing, tracked
    separately from a **Dig**, which is defending an attack.)
 4. Pick the **outcome** with **`1`**, **`2`**, **`3`**… — e.g. serve → ace / effective / bad /
-   error; receive & dig → perfect / good / in / error / kill; attack → kill / in / error.
+   error; receive & dig → perfect / good / in / error / kill; **attack → kill / tip / block-out
+   / in / blocked / error** (*how* the point was won); set → assist / dump / in / out / error.
 
-> **Quality grades are future insurance.** The perfect/good/effective/bad ratings are
-> *saved*, but a model treats them as one bucket for now — what changes a rally is only
-> **point** (ace/kill/stuff/assist), **kept in play** (effective/bad/perfect/good/in/touch/
-> dig), or **error/out**. Label the quality if you like; it's there when a finer model is
-> worth training, and ignored until then. If it slows you down, just use in/error/kill.
+> **The detail is future insurance.** Both the quality grades (perfect/good/effective) *and*
+> the attack methods (kill/tip/block-out) are *saved*, but a model treats them by result for
+> now — what changes a rally is only **point** (ace/kill/tip/block-out/stuff/dump), **kept in
+> play** (effective/bad/perfect/good/in/touch/dig/assist), or **error** (error/out/blocked).
+> Label the detail if you like; it's ready when a finer model is worth training, and ignored
+> until then. If it slows you down, just use kill/in/error.
 
 **`o` Other — rule-break faults off the ball.** Some rallies end because a player who
 *wasn't* playing the ball broke a rule (a net touch, a foot over the line, etc.) — no
