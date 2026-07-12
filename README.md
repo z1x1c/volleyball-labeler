@@ -96,7 +96,7 @@ Click **Load video** (top-left) and choose a file. Then pick a mode at the top.
 Controls shared by every mode: a **scrubber** sits right below the video (outside the
 frame, so it never covers anything you'd click) — drag it to jump anywhere; it shows
 current / total time. Also **space** = play/pause, **`→`** / **`←`** = step forward/back,
-**`z`** = undo your last label (any type), **`x`** = delete the label at the playhead; older undo, and the **speed** buttons (1× / .5× / .25×) slow fast rallies down. The
+**`z`** = undo your last label (any type), **`x`** = delete the label at the playhead, and the **speed** buttons (1× / .5× / .25×) slow fast rallies down. The
 colored bar further down shows everything you've labeled — click it to jump too.
 
 **Reviewing / correcting.** Click the **label count** in the top bar to open a **list of
