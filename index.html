@@ -170,7 +170,7 @@
 "use strict";
 const $=id=>document.getElementById(id);
 const vid=$('vid'), cv=$('cv'), ctx=cv.getContext('2d');
-let videoName="", videoFile=null, labels=[], lastToast=0, mode='ball', pending=null, courtOri='lr', scoreFlash=null;
+let videoName="", videoFile=null, labels=[], lastToast=0, mode='ball', pending=null, courtOri='lr', scoreFlash=null, history=[];
 let audioEnv=null, audioRate=0;   // audio peak envelope (bins) + bins/sec, for the waveform
 
 const ACTIONS={ serve:['ace','in','error'], attack:['kill','in','error'], block:['stuff','touch','error'], dig:['dig','kill','error'], set:['assist','kill','in','out','error'],
@@ -181,14 +181,14 @@ const MHINT={ ball:'Click the ball each step — it auto-advances so you can lab
              action:'Pause at the moment of contact, click the player, then pick action → outcome. One marker per action; label a spike + block at the same moment as two separate actions.',
              score:'Set how the teams are arranged (↔ left/right or ↕ top/bottom), then mark each point as the side that won the rally.' };
 const KHINT={
-  ball:'<kbd>click</kbd> <span class="b">ball</span> · <kbd>n</kbd> <span class="n">no ball</span> · <kbd>h</kbd> <span class="h">hard</span> · <kbd>space</kbd> play/pause · <kbd>&rarr;</kbd>/<kbd>&larr;</kbd> step · <kbd>z</kbd> undo',
-  action:'<kbd>click</kbd> the player, then <kbd>s</kbd>erve <kbd>a</kbd>ttack <kbd>b</kbd>lock <kbd>d</kbd>ig se<kbd>t</kbd> <kbd>o</kbd>ther, then <kbd>1</kbd>..<kbd>n</kbd> outcome · <kbd>z</kbd> undo/cancel · <kbd>space</kbd> play · <kbd>&rarr;</kbd>/<kbd>&larr;</kbd> step',
-  score:'<kbd>1</kbd> first side won the rally · <kbd>2</kbd> second side won (buttons show which is which) · <kbd>z</kbd> undo · <kbd>space</kbd> play/pause · <kbd>&rarr;</kbd>/<kbd>&larr;</kbd> step' };
+  ball:'<kbd>click</kbd> <span class="b">ball</span> · <kbd>n</kbd> <span class="n">no ball</span> · <kbd>h</kbd> <span class="h">hard</span> · <kbd>space</kbd> play/pause · <kbd>&rarr;</kbd>/<kbd>&larr;</kbd> step · <kbd>z</kbd> undo last · <kbd>x</kbd> delete here',
+  action:'<kbd>click</kbd> the player, then <kbd>s</kbd>erve <kbd>a</kbd>ttack <kbd>b</kbd>lock <kbd>d</kbd>ig se<kbd>t</kbd> <kbd>o</kbd>ther, then <kbd>1</kbd>..<kbd>n</kbd> outcome · <kbd>z</kbd> undo last · <kbd>x</kbd> delete here · <kbd>space</kbd> play · <kbd>&rarr;</kbd>/<kbd>&larr;</kbd> step',
+  score:'<kbd>1</kbd> first side won · <kbd>2</kbd> second side won · <kbd>z</kbd> undo last · <kbd>x</kbd> delete here · <kbd>space</kbd> play/pause · <kbd>&rarr;</kbd>/<kbd>&larr;</kbd> step' };
 
 // ---------- persistence ----------
 const KEY=n=>"vballlabeler:"+n;
 function save(){ if(videoName) try{ localStorage.setItem(KEY(videoName), JSON.stringify(labels)); }catch(e){} render(); }
-function loadStore(){ if(!videoName) return; try{ const s=localStorage.getItem(KEY(videoName)); labels=s?JSON.parse(s):[]; }catch(e){ labels=[]; }
+function loadStore(){ if(!videoName) return; history=[]; try{ const s=localStorage.getItem(KEY(videoName)); labels=s?JSON.parse(s):[]; }catch(e){ labels=[]; }
   try{ courtOri=localStorage.getItem(KEY(videoName)+':ori')||'lr'; }catch(e){ courtOri='lr'; }
   render(); if(mode==='score')renderScorePanel(); }
 
@@ -237,11 +237,11 @@ function stepSize(){ return Math.max(0.03, parseFloat($('step').value)||0.3); }
 function now(){ return Math.round(vid.currentTime*1000)/1000; }
 function pushLabel(l, replaceTol){ if(!vid.src) return;
   if(replaceTol!=null) labels=labels.filter(x=>!(x.type===l.type && Math.abs(x.t-l.t)<=replaceTol));
-  labels.push(l); labels.sort((a,b)=>a.t-b.t); save(); }
+  labels.push(l); history.push(l); labels.sort((a,b)=>a.t-b.t); save(); }
 
 function addBall(type,x,y){ const t=now(), l={t,type}; if(x!=null){l.x=Math.round(x);l.y=Math.round(y);}
   labels=labels.filter(x=>!( (x.type==='ball'||x.type==='ball_absent'||x.type==='ball_hard') && Math.abs(x.t-t)<=stepSize()*0.4));
-  labels.push(l); labels.sort((a,b)=>a.t-b.t); save();
+  labels.push(l); history.push(l); labels.sort((a,b)=>a.t-b.t); save();
   toast(type==='ball'?`ball (${l.x}, ${l.y})`:type==='ball_absent'?'no ball':'hard');
   if($('auto').checked) step(stepSize()); }
 
@@ -276,16 +276,26 @@ function setOri(o){ if(o===courtOri) return;
   courtOri=o; try{ if(videoName) localStorage.setItem(KEY(videoName)+':ori',o); }catch(e){}
   save(); renderScorePanel(); }
 
-function undo(){
+function kindsForMode(){ return mode==='ball'?['ball','ball_absent','ball_hard'] : mode==='action'?['action'] : ['score']; }
+function descOf(l){ return l.type==='action'?l.action : l.type==='score'?('point '+l.scorer) : l.type; }
+function undo(){   // z: undo the very LAST label added (any type — ball, action, or score)
+  if(mode==='action'&&pending){ cancelPending(); return; }
+  while(history.length){
+    const l=history.pop(), i=labels.indexOf(l);
+    if(i>=0){ labels.splice(i,1); save(); vid.currentTime=l.t; if(l.type==='score')renderScorePanel();
+      toast('undid '+descOf(l)); return; }
+  }
+  toast('nothing to undo');
+}
+function deleteHere(){   // x: delete the marker AT the current position (this mode)
   if(mode==='action'&&pending){ cancelPending(); return; }
   if(!labels.length) return;
-  const kinds = mode==='ball'?['ball','ball_absent','ball_hard'] : mode==='action'?['action'] : ['score'];
-  let idx=-1, t=now();
-  for(let i=0;i<labels.length;i++) if(kinds.includes(labels[i].type) && labels[i].t<=t+1e-6) idx=i;
-  if(idx<0) for(let i=0;i<labels.length;i++) if(kinds.includes(labels[i].type)) idx=i;   // else last of this kind
-  if(idx<0) return;
-  const l=labels.splice(idx,1)[0]; save();
-  if(l){ vid.currentTime=l.t; toast('undid '+(l.type==='action'?l.action:l.type)); if(mode==='score')renderScorePanel(); }
+  const kinds=kindsForMode(), t=now(), tol=Math.max(stepSize()*0.6, 0.3);
+  let best=-1, bd=tol+1e-9;
+  for(let i=0;i<labels.length;i++){ if(!kinds.includes(labels[i].type)) continue; const d=Math.abs(labels[i].t-t); if(d<=bd){ bd=d; best=i; } }
+  if(best<0){ toast('no label here to delete'); return; }
+  const l=labels.splice(best,1)[0]; save(); if(mode==='score')renderScorePanel();
+  toast('deleted '+descOf(l)+' here');
 }
 function step(dt){ if(!vid.src) return; vid.pause(); setPlayBtn(); vid.currentTime=clamp(vid.currentTime+dt,0,vid.duration||0); if(mode==='score')renderScorePanel(); }
 function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
@@ -323,6 +333,7 @@ window.addEventListener('keydown', e=>{
   if(e.target.tagName==='INPUT') return; if(!vid.src) return;
   const k=e.key.toLowerCase();
   if(k==='z'){ e.preventDefault(); undo(); return; }
+  if(k==='x'){ e.preventDefault(); deleteHere(); return; }
   if(k==='f'){ e.preventDefault(); toggleFS(); return; }
   if(k===' '){ e.preventDefault(); playpause(); return; }
   if(k==='arrowright'){ e.preventDefault(); step(stepSize()); return; }
@@ -443,7 +454,7 @@ function exportJSON(){ if(!videoName){ toast('⚠ Load a video first, then Expor
   downloadBlob(blob, videoName+'.json'); toast('⬇ exported '+videoName+'.json', 2500); }
 $('jsonPick').onchange=e=>{ const f=e.target.files[0]; if(!f) return;
   const rd=new FileReader(); rd.onload=()=>{ try{ const d=JSON.parse(rd.result);
-    labels=(d.labels||[]).filter(l=>l&&typeof l.t==='number'); labels.sort((a,b)=>a.t-b.t);
+    labels=(d.labels||[]).filter(l=>l&&typeof l.t==='number'); history=[]; labels.sort((a,b)=>a.t-b.t);
     if(d.orientation) courtOri = d.orientation==='top-bottom'?'tb':'lr';
     save(); if(mode==='score')renderScorePanel(); toast('imported '+labels.length+' labels'); }catch(err){ toast('bad json'); } }; rd.readAsText(f); };
 
