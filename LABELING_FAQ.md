@@ -221,7 +221,7 @@ After the action, pick the outcome with number keys (**`1`**, **`2`**, …):
 | **receive** | `perfect` · `good` · `in` · `overpass` · `error` · `kill` |
 | **attack** | `kill` · `tip` · `block-out` · `in` · `blocked` · `error` |
 | **dig** | `perfect` · `good` · `in` · `overpass` · `error` · `kill` |
-| **set** | `assist` · `dump` · `good set` · `error` |
+| **set** | `assist` · `dump` · `good set` · `bad set` · `error` |
 | **block** | `stuff` · `touch` · `error` |
 | **other** | `net touch` · `foot fault` · `four hits` · `reach over` · `rotation` · `other` |
 
@@ -239,7 +239,8 @@ After the action, pick the outcome with number keys (**`1`**, **`2`**, …):
   out or into the net.
 - **Set** — `assist` = your set led to a teammate's kill; `dump` = the setter attacked the
   second ball for a point; `good set` = a good, hittable set that just didn't lead to a
-  point; `error` = double/lift/handling fault or set out of bounds.
+  point; `bad set` = a poor set (hard to attack) but still in play — not an error;
+  `error` = double/lift/handling fault or set out of bounds.
 - **Block** — `stuff` = blocked straight down for a point; `touch` = you touched it (slowed
   it, kept it in play — a "soft block"); `error` = net touch / blocking error.
 

@@ -145,8 +145,8 @@ how far it jumps after each click (0.30 s is a good default).
    separately from a **Dig**, which is defending an attack.)
 4. Pick the **outcome** with **`1`**, **`2`**, **`3`**… — e.g. serve → ace / effective / bad /
    error; receive & dig → perfect / good / in / overpass / error / kill; **attack → kill / tip /
-   block-out / in / blocked / error** (*how* the point was won); set → assist / dump / good set / error
-   (**good set** = a set that didn't lead to a point but was still a good ball to hit).
+   block-out / in / blocked / error** (*how* the point was won); set → assist / dump / good set /
+   bad set / error (**good/bad set** = the set stayed in play but was a good vs a poor ball to hit).
 
 > **The detail is future insurance.** Both the quality grades (perfect/good/effective) *and*
 > the attack methods (kill/tip/block-out) are *saved*, but a model treats them by result for

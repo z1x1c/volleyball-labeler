@@ -217,10 +217,10 @@ let lineup=null;   // {A:[6 jerseys serve-order], B:[6], firstServe:'A'|'B', off
 let audioEnv=null, audioRate=0;   // audio peak envelope (bins) + bins/sec, for the waveform
 
 // Fine outcomes are stored; for the model they collapse to point (ace/kill/tip/block-out/stuff/dump) /
-// in-play (effective/bad/perfect/good/in/overpass/touch/dig/assist/good set) / error (error/out/blocked). Fine grades = future insurance.
+// in-play (effective/bad/perfect/good/in/overpass/touch/dig/assist/good set/bad set) / error (error/out/blocked). Fine grades = future insurance.
 const ACTIONS={ serve:['ace','effective','bad','error'], receive:['perfect','good','in','overpass','error','kill'],
   attack:['kill','tip','block-out','in','blocked','error'], dig:['perfect','good','in','overpass','error','kill'],
-  set:['assist','dump','good set','error'], block:['stuff','touch','error'],
+  set:['assist','dump','good set','bad set','error'], block:['stuff','touch','error'],
   other:['net touch','foot fault','four hits','reach over','rotation','other'] };
 const ACTKEY={ s:'serve', r:'receive', a:'attack', b:'block', d:'dig', t:'set', o:'other' };
 const COLORS={ ball:'#33d17a', ball_absent:'#ff6b6b', ball_hard:'#c792ea', action:'#4dc3ff', score:'#f5c542' };
