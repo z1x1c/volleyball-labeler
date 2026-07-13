@@ -258,6 +258,62 @@ const FAQ = [
  {s:"Data", q:"Which browsers work?",
   a:"Chrome, Edge, Firefox and Safari (recent versions) all work.",
   t:["browser","chrome","edge","firefox","safari","which browser","compatible"]},
+
+ {s:"Workflow", q:"Do I label one mode at a time, or everything per rally?",
+  a:"Either works — do what keeps you in a rhythm. Many people find it faster to do <b>one focused pass per mode</b> (a Ball pass through the video, then an Actions pass) so they're not constantly switching. If a coordinator assigned you one type, just do that. Order matters less than staying focused and consistent.",
+  t:["one mode","per rally","order","workflow","which first","pass","approach","how to work","sequence","ball first","actions first","ball then actions","which mode","mode order"]},
+
+ {s:"Workflow", q:"Should I slow the video down?",
+  a:"Yes, whenever it helps — the <b>speed buttons</b> (1× / .5× / .25×) are there for fast rallies. Accuracy beats speed: slow down for the busy moments, play normally through the calm ones.",
+  t:["slow","slow motion","speed","fast rally","playback speed","slower","0.5x","slow down"]},
+
+ {s:"Workflow", q:"Can I stop and come back later?",
+  a:"Yes. Your work <b>auto-saves per video in the browser</b>, so close the tab and reopen the <i>same</i> video in the <i>same</i> browser to continue. Switching computers or browsers? <b>Export a file</b> and <b>Import</b> it later to pick up where you left off.",
+  t:["stop","pause","resume","come back","later","continue","save progress","break","finish later","not done"]},
+
+ {s:"Workflow", q:"How do I see what I've already labeled?",
+  a:"The <b>colored track</b> under the video marks where your labels are (by type), and the <b>label count</b> in the top bar opens the full list. Use them to spot gaps and avoid re-doing a section.",
+  t:["already labeled","coverage","what have i done","progress","track","done","gaps","where labeled","completed"]},
+
+ {s:"Workflow", q:"Can two of us split one video?",
+  a:"The app doesn't automatically <b>merge</b> two people's labels, so the clean ways are: <b>one person per video</b>; or <b>split by time range</b> and hand off the exported file (the next person Imports it and continues); or <b>split by mode</b> (one does Ball, one Actions) with a coordinator combining. Avoid two people labeling the <i>same</i> video separately and expecting an automatic merge.",
+  t:["split","two people","share video","divide","team","collaborate","merge","together","multiple labelers","divide work"]},
+
+ {s:"Workflow", q:"Do I label every single touch in a rally, or just the key ones?",
+  a:"Label the meaningful contacts you're confident about — the <b>serve</b>, the <b>reception/pass</b>, the <b>set</b>, the <b>attack</b>, and any <b>block</b> or <b>dig</b>. The <b>terminal (scoring) touch</b> of each rally matters most. Don't force a label on a touch you can't identify — skip it.",
+  t:["every touch","all touches","key touches","which touches","how many per rally","all contacts","important touches"]},
+
+ {s:"Score", q:"What counts as one rally for the score?",
+  a:"One rally = from the <b>serve</b> until the <b>ball is dead</b> (a point is awarded). Each point = one Score mark. Don't mark mid-rally.",
+  t:["one rally","what is a rally","count rally","rally definition","when to mark score","point","how long rally"]},
+
+ {s:"Score", q:"The scoreboard shows a different score than I counted.",
+  a:"Label each rally by <b>what actually happened on court</b> (who won the rally as played). The rotation tracking follows your sequence of rally winners, not the number on the board.",
+  t:["scoreboard","different score","wrong score","board","mismatch","disagree score","count differs"]},
+
+ {s:"Technical", q:"What video files / formats work?",
+  a:"Whatever your browser can play — <b>MP4 (H.264)</b> is the safest bet; MOV and WebM often work too. If a file won't load or play, convert it to MP4.",
+  t:["format","formats","file type","mp4","mov","webm","video format","which file","codec","wont load","avi","mkv","upload format","what can i upload"]},
+
+ {s:"Technical", q:"My video is very large or very long — is that a problem?",
+  a:"Long is fine. Very large files (over ~800 MB) <b>skip the audio waveform</b> to stay responsive, but everything else still works. If playback is choppy, use a smaller / lower-resolution copy.",
+  t:["large","big file","long video","huge","size","gb","file too big","waveform skipped","long match"]},
+
+ {s:"Technical", q:"Playback is laggy or choppy.",
+  a:"Usually the browser struggling with a big file. Try a lower-resolution copy, close other tabs, or use the local-server method (README). The slow-motion <b>speed buttons</b> also help on fast rallies.",
+  t:["laggy","choppy","slow playback","stutter","lag","freezing","performance","jerky","not smooth","video laggy","video slow","playing slow"]},
+
+ {s:"Technical", q:"The keyboard shortcuts aren't working.",
+  a:"Make sure a <b>video is loaded</b>, you're in the <b>right mode</b>, and you're <b>not typing in a text box</b> (click on the video first). Shortcuts are per-mode — e.g. <code>s</code> only works in Actions, <code>n</code> only in Ball.",
+  t:["shortcuts","keys not working","keyboard","hotkeys","not responding","cant press","keys dont work","nothing happens"]},
+
+ {s:"Technical", q:"Can I edit or move a label after I place it?",
+  a:"Yes. Open the <b>label list</b> (click the count in the top bar), click a label to <b>jump to it</b>, then fix it — re-click to re-place a ball, or hit <b>✕</b> to delete. <code>z</code> undoes your last label; <code>x</code> deletes the one at the playhead.",
+  t:["edit","move","change label","fix label","correct","re-place","relocate","adjust","modify","reposition"]},
+
+ {s:"Technical", q:"Can I label on a phone or tablet?",
+  a:"It'll open, but labeling needs precise clicks and keyboard shortcuts — use a <b>laptop or desktop with a mouse</b> for real work.",
+  t:["phone","tablet","mobile","ipad","touchscreen","device","laptop","desktop","android","iphone"]},
 ];
 
 // ---- synonym expansion: query word -> extra canonical words to also match ----
@@ -279,10 +335,10 @@ const SYN = {
   timing:["contact","when"], moment:["contact","when"], frame:["contact"], place:["mark"], marking:["mark"],
   tool:["block-out"], setter:["set","dump"], stuffed:["stuff","blocked"],
   camera:["shaky"], blurry:["blur"], blurred:["blur"], occluded:["hidden"], obscured:["hidden"],
-  count:["many","quota"], amount:["many"], quantity:["many"], target:["many","quota"],
+  amount:["many"], quantity:["many"], target:["many","quota"],
   begin:["open","start"], run:["open"], launch:["open"],
 };
-const STOP = new Set("a an the is are do i my me you it to of in on at for and or how what when do does can should if this that with be as your".split(" "));
+const STOP = new Set("a an the is are do i my me you it to of in on at for and or how what when do does can should if this that with be as your use used using get got".split(" "));
 
 function toks(s){ return (s.toLowerCase().match(/[a-z0-9][a-z0-9-]*/g)||[]).filter(w=>w.length>1&&!STOP.has(w)); }
 function expand(ws){ const out=new Set(); for(const w of ws){ out.add(w); (SYN[w]||[]).forEach(x=>out.add(x)); } return [...out]; }

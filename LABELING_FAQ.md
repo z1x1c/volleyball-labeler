@@ -29,7 +29,8 @@ happened, and when you're not sure — skip it. A smaller clean set beats a big 
 9. [Tricky situations](#9-tricky-situations)
 10. [Common mistakes to avoid](#10-common-mistakes-to-avoid)
 11. [Quality checklist](#11-quality-checklist)
-12. [Technical & privacy questions](#12-technical--privacy-questions)
+12. [Workflow, pacing & teamwork](#12-workflow-pacing--teamwork)
+13. [Technical & privacy questions](#13-technical--privacy-questions)
 
 ---
 
@@ -312,6 +313,13 @@ rally**.
 yes — the running server is computed from the full sequence of winners. If you skip points,
 the "who's serving" readout will drift (you can nudge it back; see below).
 
+**Q: What counts as *one rally* for the score?** One rally = from the **serve** until the
+**ball is dead** (a point is awarded). Each point = one Score mark. Don't mark mid-rally.
+
+**Q: The scoreboard shows a different score than I counted.** Label each rally by **what
+actually happened on court** (who won the rally as played). The rotation tracking follows
+your sequence of rally winners, not the number on the board.
+
 ---
 
 ## 8. 2D Court & lineup
@@ -407,13 +415,70 @@ Before you consider a video "done," a good labeler can say yes to these:
 
 ---
 
-## 12. Technical & privacy questions
+## 12. Workflow, pacing & teamwork
+
+**Q: Do I label one mode at a time, or everything per rally?** Either works — do what keeps
+you in a rhythm. Many people find it faster to do **one focused pass per mode** (e.g. a Ball
+pass through the video, then an Actions pass) so they're not constantly switching modes and
+mindsets. If a coordinator assigned you a single type, just do that. Order matters less than
+staying focused and consistent.
+
+**Q: Should I slow the video down?** Yes, whenever it helps — the **speed buttons** (1× /
+.5× / .25×) are there for fast rallies. Accuracy beats speed: slow down for the busy moments,
+play normally through the calm ones.
+
+**Q: Can I stop and come back later?** Yes. Your work **auto-saves per video in the browser**,
+so you can close the tab and reopen the *same* video in the *same* browser to continue. If
+you'll switch computers or browsers — or just want to be safe — **export a file** and
+**Import** it later to pick up where you left off.
+
+**Q: How do I see what I've already labeled?** The **colored track** under the video marks
+where your labels are (by type), and the **label count** in the top bar opens the full list.
+Use them to spot gaps and avoid re-doing a section.
+
+**Q: Can two of us split one video?** The app doesn't automatically *merge* two people's
+labels, so the clean ways are: **one person per video**; or **split by time range** and hand
+off the exported file (the next person **Import**s it and continues from your labels); or
+**split by mode** (one does Ball, one does Actions) with a coordinator combining. Avoid two
+people labeling the *same* video separately and expecting an automatic merge.
+
+**Q: Do I label every single touch in a rally, or just the key ones?** Label the meaningful
+contacts you're confident about — the **serve**, the **reception/pass**, the **set**, the
+**attack**, and any **block** or **dig**. The **terminal (scoring) touch** of each rally
+matters most. Don't force a label on a touch you can't identify — skip it.
+
+---
+
+## 13. Technical & privacy questions
 
 **Q: Do I need internet?** No — fully offline once you have the folder.
 
 **Q: Is my video uploaded anywhere?** No. It's read from your disk and never sent anywhere.
 
 **Q: Which browsers work?** Chrome, Edge, Firefox, Safari (recent versions).
+
+**Q: What video files work?** Whatever your browser can play — **MP4 (H.264)** is the safest
+bet; MOV and WebM often work too. If a file won't load or play, convert it to MP4.
+
+**Q: My video is very large or very long — is that a problem?** Long is fine. Very large
+files (over ~800 MB) **skip the audio waveform** to stay responsive, but everything else
+still works. If playback is choppy, use a smaller / lower-resolution copy.
+
+**Q: Playback is laggy or choppy.** Usually the browser struggling with a big file. Try a
+lower-resolution copy, close other tabs, or use the local-server method (see README). The
+slow-motion **speed buttons** also help on fast rallies.
+
+**Q: The keyboard shortcuts aren't doing anything.** Make sure a **video is loaded**, you're
+in the **right mode**, and you're **not typing in a text box** (click on the video first).
+Shortcuts are per-mode — e.g. `s` only works in Actions, `n` only in Ball.
+
+**Q: Can I edit or move a label after I place it?** Yes. Open the **label list** (click the
+count in the top bar), click a label to **jump to it**, then fix it — re-click to re-place a
+ball, or hit **✕** to delete it. `z` undoes your last label; `x` deletes the one at the
+playhead.
+
+**Q: Can I label on a phone or tablet?** It'll open, but labeling needs precise clicks and
+keyboard shortcuts — use a **laptop or desktop with a mouse** for real work.
 
 **Q: I lost my labels!** They auto-save per video in the browser — same browser + same video
 brings them back. If you exported a `.json`, **Import** it. This is why we export backups.
