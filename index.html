@@ -196,7 +196,7 @@
       <div class="lurow"><div class="lulbl" id="luAlbl">Team A</div><div id="luAin" class="luins"></div></div>
       <div class="lurow"><div class="lulbl" id="luBlbl">Team B</div><div id="luBin" class="luins"></div></div>
       <div class="lurow" style="margin-top:6px"><div class="lulbl">Serves first</div>
-        <div class="seg"><button class="btn lufs on" data-fs="A" onclick="pickFirst('A')" id="lufsA">Team A</button><button class="btn lufs" data-fs="B" onclick="pickFirst('B')" id="lufsB">Team B</button></div></div>
+        <div class="seg"><button class="btn lufs on" data-fs="A" onclick="pickFirst('A')" id="lufsA">Left</button><button class="btn lufs" data-fs="B" onclick="pickFirst('B')" id="lufsB">Right</button></div></div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
         <button class="btn" onclick="closeLineup()">Cancel</button>
         <button class="btn" style="background:var(--accent);color:#111;border-color:var(--accent);font-weight:700" onclick="saveLineupForm()">Save lineup</button>
@@ -551,6 +551,7 @@ cCanvas.addEventListener('click', e=>{ if(!lineup||!vid.src) return; const r=cCa
 function rotNudge(d){ if(!lineup) return; const R=rotationAt(vid.currentTime); if(!R) return; lineup.offset=lineup.offset||{A:0,B:0}; lineup.offset[R.serving]=((lineup.offset[R.serving]||0)+d); saveLineup(); drawCourt(); toast('rotation nudged for '+sideLabel(R.serving==='A'?sides()[0]:sides()[1])); }
 // lineup modal
 function openLineup(){ if(!vid.src){ toast('load a video first'); return; } const [a,b]=sides(); $('luAlbl').textContent=sideLabel(a); $('luBlbl').textContent=sideLabel(b);
+  $('lufsA').textContent=sideLabel(a); $('lufsB').textContent=sideLabel(b);   // serve buttons match the row labels (LEFT/RIGHT), not "Team A/B"
   for(const s of ['A','B']){ const box=$('lu'+s+'in'); box.innerHTML=''; for(let i=0;i<6;i++){ const inp=document.createElement('input'); inp.id='lu'+s+i; inp.maxLength=3; inp.placeholder=(i+1); if(lineup&&lineup[s]) inp.value=lineup[s][i]||''; box.appendChild(inp); } }
   _luFirst=(lineup&&lineup.firstServe)||'A'; pickFirst(_luFirst); $('lineupmodal').style.display='flex'; }
 function pickFirst(x){ _luFirst=x; document.querySelectorAll('.lufs').forEach(el=>el.classList.toggle('on', el.dataset.fs===x)); }
